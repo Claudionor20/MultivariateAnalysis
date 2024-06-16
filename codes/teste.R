@@ -17,6 +17,6 @@ df <- read_csv(arquivo)  # Lendo uma base de dados dentro da pasta database
 salvo <- file.path(caminho, "teste1.csv")
 write.csv(df, salvo , row.names = F) # Salvando o csv na pasta database
 
-
+dasdsa
 
 
