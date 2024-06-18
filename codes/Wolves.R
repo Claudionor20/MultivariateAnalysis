@@ -76,7 +76,30 @@ corrplot::corrplot(cor(Wolves[,4:12]), method = "square" , order = "hclust", tl.
 cor(Wolves[,4:12])
 
 
+#### K-means ####
+library(factoextra)
 
+X = as.matrix(Wolves[,-c(1:3)])
 
+# Determinar o número ótimo de clusters usando o método WSS (Within-Cluster Sum of Squares)
+fviz_nbclust(X, kmeans, method = "wss")
+
+# Definir o número de clusters
+K = 5
+
+# Realizar o algoritmo K-means nos dados
+set.seed(123)  # Para garantir a reprodutibilidade
+km_res <- kmeans(X, centers = K)
+
+# Plotar os clusters fornecidos pelo K-means
+plot(X, col = km_res$cluster, pch = 16, main = "Clusters K-means")
+
+# Plotar os centróides dos grupos
+points(km_res$centers, col = 1:K, pch = 8, cex = 2)
+
+# Plotar o gráfico de agrupamento usando fviz_cluster
+fviz_cluster(km_res, data = X,
+             ggtheme = theme_minimal(),
+             main = "Gráfico de Agrupamento")
 
 
