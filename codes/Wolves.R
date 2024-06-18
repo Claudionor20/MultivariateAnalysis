@@ -7,13 +7,13 @@ if (!require(candisc)) {
 library(candisc)
 library(dplyr)
 library(ggplot2)
-
+install.packages("cluster")
+library(cluster)
 ####Base de dados  ####
 data(Wolves)
 str(Wolves)
 
-Wolves = Wolves |> mutate(across(c(4:6), as.numeric))
-str(Wolves)
+naniar::miss_var_summary(Wolves)
 
 ##### Análise exploratória: ####
 
@@ -78,9 +78,14 @@ cor(Wolves[,4:12])
 
 #### K-means ####
 library(factoextra)
+Wolves
+X = Wolves[,-c(1:3)]
 
-X = as.matrix(Wolves[,-c(1:3)])
+#X = X |> 
+  #mutate(across(c(location,sex), as.factor))
 
+X = as.matrix(X)
+str(X)
 # Determinar o número ótimo de clusters usando o método WSS (Within-Cluster Sum of Squares)
 fviz_nbclust(X, kmeans, method = "wss")
 
@@ -102,4 +107,61 @@ fviz_cluster(km_res, data = X,
              ggtheme = theme_minimal(),
              main = "Gráfico de Agrupamento")
 
+#### Hierarquico ####
+###Mantendo a variável location e sex 
+
+##como numeric
+Xh = Wolves[,-1]
+Xh$location = ifelse(Xh$location == "rm", 1,0)
+Xh$sex = ifelse(Xh$sex == "m", 1,0)
+
+Xh = Xh |> 
+  mutate(across(c(location,sex), as.numeric))
+
+Xh = scale(Xh)
+dist_matrix <- dist(Xh)
+
+# Step 3: Perform hierarchical clustering using complete linkage
+hc_complete <- hclust(dist_matrix, method = "complete")
+
+# Step 4: Plot the dendrogram
+plot(hc_complete, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
+
+##como factor
+
+XF = Wolves[,-1]
+XF$location = ifelse(XF$location == "rm", 1,0)
+XF$sex = ifelse(XF$sex == "m", 1,0)
+XF = XF |> 
+  mutate(across(c(location,sex), as.factor),
+         across(c(4:11), as.numeric))
+
+XF[3:11] = scale(XF[3:11])
+
+str(XF)
+dist_matrixF <- daisy(XF, metric  = "gower")
+
+# Step 3: Perform hierarchical clustering using complete linkage
+hc_completeF <- hclust(dist_matrix, method = "complete")
+
+# Step 4: Plot the dendrogram
+plot(hc_completeF, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
+
+## sem as duas primeiras 
+
+Xp = scale(X)
+
+dist_matrixp <- dist(Xp)
+
+# Step 3: Perform hierarchical clustering using complete linkage
+hc_completep <- hclust(dist_matrixp, method = "complete")
+
+# Step 4: Plot the dendrogram
+plot(hc_completep, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
+
+#
+par(mfrow = c(3,1))
+plot(hc_complete, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
+plot(hc_completeF, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
+plot(hc_completep, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
 
