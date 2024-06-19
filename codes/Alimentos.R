@@ -55,7 +55,7 @@ cluster_All2
 
 #k = 3
 clustersAll_3 <- cutree(hc_All, k = 3)
-cluster_All3 = data.frame(clustersAll_2)
+cluster_All3 = data.frame(cluster_All3)
 cluster_All3$cluster <- clustersAll_3
 cluster_All3$pais = dados$pais
 cluster_All3
