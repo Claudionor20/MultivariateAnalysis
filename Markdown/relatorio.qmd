@@ -167,7 +167,7 @@ Com a base devidamente importada e sem a presença de valores faltantes, prosseg
 ## Análise descritiva: 
 
 Primeiro, verificamos as variáveis qualitativas da base de dados: 
-```{r}
+```{r grupos}
 library(ggplot2)
 table(Wolves$sex)
 table(Wolves$location)
@@ -181,13 +181,13 @@ Observa-se que o grupo mais presente na amostra são de lobos machos da localiza
 
 Para as variáveis quantitativas, considere as seguintes medidas de resumo:
 
-```{r}
+```{r medidas}
 summary(Wolves[,4:12]) ### Melhorar essas medidas -> dp, cv, assimetria
 ```
 
 Além das medidas resumos, pode ser de interesse realizar uma análise gráfica nos dados. Para isso, veja o histograma das variáveis: 
 
-```{r}
+```{r histograma}
 par(mfrow = c(3,3))
 str(Wolves)
 for(i in 1:ncol(Wolves)){
@@ -202,7 +202,7 @@ for(i in 1:ncol(Wolves)){
 ```
 Surge também, a necessidade de verificar a correlação entre as variáveis. 
 
-```{r}
+```{r correlacao}
 pairs(Wolves[,4:12], 
       pch=21)
 
@@ -213,10 +213,11 @@ corrplot::corrplot(cor(Wolves[,4:12]), method = "square" , order = "hclust", tl.
 
 Por fim, considere o boxplot das variáveis separadas por grupo. 
 
-```{r}
+```{r boxplot}
 plots <- list()
-
 for (i in 1:ncol(Wolves)) {
+  var_name = names(Wolves)[i]
+
   if (is.numeric(Wolves[[var_name]])) {
     label <- attr(Wolves[[var_name]], "label")
   
@@ -332,16 +333,7 @@ cluster_fl3
 
 ```
 
-## Visualização gráfico -> pesquisar sobre
 
-```{r}
-library(factoextra)
-
-fviz_cluster(list(data = dados_LF, cluster = clustersFL_3),
-             geom = "point",
-             ellipse.type = "norm",
-             main = "Cluster usando Leite e Frutas/Legumes")
-```
 
 Cortando as árvores referente a $complete \quad linkage$ com todas variáveis
 
@@ -355,13 +347,22 @@ cluster_All2
 
 #k = 3
 clustersAll_3 <- cutree(hc_All, k = 3)
-cluster_All3 = data.frame(cluster_All3)
+cluster_All3 = data.frame(clustersAll_3)
 cluster_All3$cluster <- clustersAll_3
 cluster_All3$pais = dados$pais
 cluster_All3
 
 ```
+## Visualização gráfico -> pesquisar sobre
 
+```{r}
+library(factoextra)
+
+fviz_cluster(list(data = dados_LF, cluster = clustersFL_3),
+             geom = "point",
+             ellipse.type = "norm",
+             main = "Cluster usando Leite e Frutas/Legumes")
+```
 
 # Questão 4 
 

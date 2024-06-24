@@ -1,6 +1,6 @@
 dados = read.table("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/alimentos.txt", header = T)
 
-
+row.names(dados)=dados$pais
 #### Construindo hierarquia utilizando apenas leite e fruta/legumes
 #
 dados_LF = dplyr::select(dados, lech, fleg)
@@ -18,7 +18,9 @@ dist_matrix_All = dist(dados_All)
 
 hc_All = hclust(dist_matrix_All, method = "complete")
 
-plot(hc_All, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
+par(mfrow = c(2,1))
+plot(hc_All, main = "Complete Linkage Hierarchical Clustering (ALL)", sub = "", xlab = "")
+plot(hc_FL, main = "Complete Linkage Hierarchical Clustering (LL)", sub = "", xlab = "")
 
 #### Todas as variaveis utilizando o average 
 
@@ -60,4 +62,13 @@ cluster_All3$cluster <- clustersAll_3
 cluster_All3$pais = dados$pais
 cluster_All3
 
+par(mfrow = c(2,1))
+plot(hc_All, main = "Complete Linkage Hierarchical Clustering (ALL)", sub = "", xlab = "")
+plot(hc_avg, main = " AVG Linkage Hierarchical Clustering (ALL)", sub = "", xlab = "")
 
+
+clusters_avg3 <- cutree(hc_avg, k = 3)
+cluster_avg3 = data.frame(clusters_avg3)
+cluster_avg3$cluster <- clustersavg_3
+cluster_avg3$pais = dados$pais
+cluster_avg3
