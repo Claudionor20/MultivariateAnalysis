@@ -15,7 +15,7 @@ str(Wolves)
 
 naniar::miss_var_summary(Wolves)
 
-##### Análise exploratória: ####
+##### Análise exploratória (2A): ####
 
 #
 
@@ -75,8 +75,39 @@ corrplot::corrplot(cor(Wolves[,4:12]), method = "square" , order = "hclust", tl.
 
 cor(Wolves[,4:12])
 
+#### Análise Discriminante (2B) ####
 
-#### K-means ####
+head(Wolves)
+
+N_W <- Wolves[,4:length(Wolves)]
+
+
+mvn(data = N_W, mvnTest = "mardia", multivariatePlot = "qq") #Conjuntamente segue normalmultivariada, ou seja, os grupos seguem normal multivarida.
+
+X<-as.matrix(Wolves[,c(-1,-2,-3)])
+X_d <- dist(X)
+X <- betadisper(X_d,Wolves$group)
+permutest(X) # Matriz de covariancias são homogeneas
+plot(X)
+
+
+Manova <- aov(x1+x2+x3+x4+x5+x6+x7+x8+x9 ~ group, data = Wolves)
+summary(Manova) # As medias não são homogeneas
+
+#Análise discriminante
+Wolves_n <- Wolves[,c(1,4:12)]
+spe.lda <- lda(group ~., data=Wolves_n)
+
+round(predict(spe.lda)$posterior,2)
+
+ta <- table(Wolves[,1],predict(spe.lda)$class)
+
+diag(prop.table(ta,1))
+
+confusionmatrix(predict(spe.lda)$class, Wolves$group)
+
+
+#### K-means (2C) ####
 library(factoextra)
 Wolves
 X = Wolves[,-c(1:3)]
@@ -107,7 +138,7 @@ fviz_cluster(km_res, data = X,
              ggtheme = theme_minimal(),
              main = "Gráfico de Agrupamento")
 
-#### Hierarquico ####
+#### Hierarquico (2D) ####
 ###Mantendo a variável location e sex 
 
 ##como numeric
@@ -149,7 +180,8 @@ plot(hc_completeF, main = "Complete Linkage Hierarchical Clustering", sub = "", 
 
 ## sem as duas primeiras 
 
-Xp = scale(X)
+Xp = XF[,c(-1,-2)]
+Xp <- scale(Xp)
 
 dist_matrixp <- dist(Xp)
 
