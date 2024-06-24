@@ -1,0 +1,137 @@
+---
+title: "Demonstração da Direção Discriminante de Fisher"
+format:
+  html:
+    toc: true
+    html-math-method: katex
+    css: styles.css
+---
+
+# Introdução
+
+Neste documento, demonstramos a direção discriminante de Fisher para discriminação linear entre duas populações. Consideramos duas populações $\pi_1$ e $\pi_2$ baseadas na amostra rotulada $( {(xj , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que $n_1 + n_2 = n$ e $n_i$ é o número de elementos da população $\pi_i$.
+
+## Definições
+
+-   $\bar{x}_i$ representa o vetor de médias das observações em $\pi_i$.
+-   $S_i$ representa a matriz de covariâncias amostral das observações em $\pi\_i$.
+-   $S_p$ = $\frac{(n_1-1)S_1 + (n_2-1)S_2}{n-2}$ é a matriz de covariâncias combinada.
+
+## Projeção
+
+Para $\alpha, x \in \mathbb{R}^p$, definimos a projeção como:
+
+$$
+\begin{align}
+ & z = \alpha^T x
+\end{align}
+$$
+
+E consequentemente, as médias das populações $\pi_1$ e $\pi_2$ projetadas serão
+
+$\hat m_1 = \alpha^T \space \bar{x}_1$
+
+$\hat m_2 = \alpha^T \space \bar{x}_1$
+
+E a diferença dessas projeções sendo
+
+$\hat m_1 - \hat m_2 = \alpha^T(\bar{x}_1 - \bar{x}_2)$.
+
+A variabilidade resultante na projeção é a variância da projeção $z$, que é dada por
+
+$$
+\begin{align}
+    & Var(z) = Var(\alpha^T x) \nonumber \\
+    & = \alpha^T \space Var(x) \space \alpha \nonumber \\
+    & = \alpha^T \mathcal{S}_p \space \alpha \nonumber
+\end{align}
+$$
+
+E então, $\phi = \left(\frac{\hat m_1 - \hat m_2}{S_z}\right)^2 = \left(\frac{\alpha^T (\bar{x}_1 - \bar{x}_2)}{\sqrt{\alpha^T S_p \space \alpha}}\right)^2$.
+
+## Maximização da Distância
+
+Queremos encontrar a direção $\alpha$ que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção. Ou seja, queremos maximizar:
+
+$$
+\begin{equation}
+\phi = \left(\frac{\alpha^T (\bar{x}_1 - \bar{x}_2)}{\sqrt{\alpha^T S_p \alpha}}\right)^2
+\end{equation}
+$$
+
+# Demonstração
+
+Vamos aplicar a restrição $\alpha^T S_p \space \alpha$ constante e igual à $1$, pois do contrário poderíamos ter $\phi$ tão grande quanto desejável. Nesse caso, então, vamos usar o método de Lagrange para otimização com restrição.
+
+Começamos com a expressão a ser maximizada:
+
+$$
+\phi = \frac{(\alpha^T (\bar{x}_1 - \bar{x}_2))^2}{\alpha^T S_p \space \alpha}
+$$
+
+Para maximizar $\phi$, usamos multiplicadores de Lagrange. Definimos a função Lagrangiana:
+
+$$ 
+\mathcal{L}(\alpha, \lambda) = (\alpha^T (\bar{x}_1 - \bar{x}_2))^2 - \lambda (\alpha^T S_p \space \alpha - 1)
+$$
+
+Tomamos a derivada em relação a $\alpha$ e a igualamos a zero:
+
+$$
+\frac{\partial \mathcal{L}}{\partial \alpha} = 2 (\bar{x}_1 - \bar{x}_2) (\alpha^T (\bar{x}_1 - \bar{x}_2)) - \lambda 2 S_p \alpha = 0
+$$
+
+E agora, para $\lambda$:
+
+$$
+\frac{\partial \mathcal{L}}{\partial \lambda} = \alpha^T S_p \space \alpha - 1
+$$
+
+O que nos fornece então o seguinte sistema de equações:
+
+$$
+\begin{cases}
+\frac{\partial \mathcal{L}}{\partial \alpha} = 2 (\bar{x}_1 - \bar{x}_2) (\alpha^T (\bar{x}_1 - \bar{x}_2)) - \lambda 2 S_p \space \alpha = 0 \\
+\\
+\frac{\partial \mathcal{L}}{\partial \lambda} = \alpha^T S_p \space \alpha - 1
+\end{cases}
+$$
+
+Da primeira equação, temos que
+
+$$
+(\bar{x}_1 - \bar{x}_2) = \lambda S_p \space \alpha
+$$
+
+Para encontrar $\lambda$, substituímos $\alpha$ na segunda equação de restrição:
+
+$$
+\begin{equation}
+(\bar{x}_1 - \bar{x}_2) = \lambda S_p \space \alpha \implies \alpha = \frac{S_p^{-1}(\bar{x}_1 - \bar{x}_2)}{\lambda}
+\end{equation}
+$$
+
+A partir da restrição $\alpha^T S_p \space \alpha = 1$, temos:
+
+$$
+\begin{align}
+ & \left(\frac{S_p^{-1}(\bar{x}_1 - \bar{x}_2)}{\lambda}\right)^T S_p \left(\frac{S_p(\bar{x}_1 - \bar{x}_2)}{\lambda}\right) = 1 \nonumber \\
+ & \frac{1}{\lambda^2}(\bar{x}_1 - \bar{x}_2)^T S_p^{-1} \space S_p S_p^{-1} (\bar{x}_1 - \bar{x}_2) = 1 \nonumber \\
+ & \lambda^2 = (\bar{x}_1 - \bar{x}_2)^T S_p^{-1} (\bar{x}_1 - \bar{x}_2) \nonumber \\
+ & \lambda = \sqrt{(\bar{x}_1 - \bar{x}_2)^T S_p^{-1} (\bar{x}_1 - \bar{x}_2)}
+\end{align}
+$$
+
+E agora, substituindo $\lambda$ encontrado em (4) na equação de $\alpha$ (3), temos:
+
+$$
+\begin{equation}
+\alpha = \frac{S_p^{-1}(\bar{x}_1 - \bar{x}_2)}{\sqrt{(\bar{x}_1 - \bar{x}_2)^T S_p^{-1} (\bar{x}_1 - \bar{x}_2)}}
+\end{equation}
+$$
+
+Note que o denominador dessa equação é um escalar $1x1$, e portanto, a direção de $\alpha$ que maximiza a diferença das duas populações é dada pelo vetor $\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)$ pelo método de otimização restrita de Lagrange.
+
+# Conclusão
+
+Dessa forma, mostramos que a direção $\alpha$ que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção é a direção discriminante de Fisher.
