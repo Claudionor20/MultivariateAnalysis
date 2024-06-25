@@ -78,8 +78,6 @@ nomes_variaveis_correlacionadas <- colnames(base_sem_ips)[variaveis_correlaciona
 print(nomes_variaveis_correlacionadas)
 
 #### PCA ####
-
-
 library(ggplot2)
 library(FactoMineR)
 library(factoextra)
@@ -104,9 +102,9 @@ View(loadings)
 #o segundo representa um componente que relaciona segurança, criminalidade, liberdades individuais e acesso a serviços urbanos ( porra não consegui interpretar melhor n )
 #o terceiro representa o acesso ao saneamento basico
 #o quarto representa a vulnerabilidade social e direitos individuais?????????????????????
-#o quinto representa saúde e qualidade ambiental?????????
+#o quinto representa saúde e qualidade ambiental??????????
 
-fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 50),main = "")
+fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 50),main = "") #gráficos
 
 fviz_pca_var(pca_result, axes = c(1,2),col.var = "black",repel = TRUE) 
 
