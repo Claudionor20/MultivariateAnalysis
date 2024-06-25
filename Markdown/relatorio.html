@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.554">
+<meta name="generator" content="quarto-1.4.555">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -69,8 +69,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="relatorio_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="relatorio_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -99,6 +113,7 @@ window.Quarto = {
 };
 </script>
 
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -183,107 +198,107 @@ window.Quarto = {
 <p>Trabalho final da disciplina de Análise Multivariada, referente ao primeiro período de 2024. Esse trabalho é uma colaboração de Caio Falcão, Claudionor Ferreira, Guilherme Ceacero e Paulo Martinez.</p>
 <section id="questão-1" class="level1">
 <h1>Questão 1</h1>
-<p>Nesta seção, demonstramos a direção discriminante de Fisher para discriminação linear entre duas populações. Consideramos duas populações <span class="math inline">\(\pi_1\)</span> e <span class="math inline">\(\pi_2\)</span> baseadas na amostra rotulada <span class="math inline">\(( {(xj , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )\)</span>, em que <span class="math inline">\(n_1 + n_2 = n\)</span> e <span class="math inline">\(n_i\)</span> é o número de elementos da população <span class="math inline">\(\pi_i\)</span>.</p>
+<p>Nesta seção, demonstramos a direção discriminante de Fisher para discriminação linear entre duas populações. Consideramos duas populações <span class="math inline">\pi_1</span> e <span class="math inline">\pi_2</span> baseadas na amostra rotulada <span class="math inline">( {(xj , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )</span>, em que <span class="math inline">n_1 + n_2 = n</span> e <span class="math inline">n_i</span> é o número de elementos da população <span class="math inline">\pi_i</span>.</p>
 <section id="considerações" class="level2">
 <h2 class="anchored" data-anchor-id="considerações">Considerações</h2>
 <section id="definições" class="level3">
 <h3 class="anchored" data-anchor-id="definições">Definições</h3>
 <ul>
-<li><span class="math inline">\(\bar{x}_i\)</span> representa o vetor de médias das observações em <span class="math inline">\(\pi_i\)</span>.</li>
-<li><span class="math inline">\(S_i\)</span> representa a matriz de covariâncias amostral das observações em <span class="math inline">\(\pi\_i\)</span>.</li>
-<li><span class="math inline">\(S_p\)</span> = <span class="math inline">\(\frac{(n_1-1)S_1 + (n_2-1)S_2}{n-2}\)</span> é a matriz de covariâncias combinada.</li>
+<li><span class="math inline">\bar{x}_i</span> representa o vetor de médias das observações em <span class="math inline">\pi_i</span>.</li>
+<li><span class="math inline">S_i</span> representa a matriz de covariâncias amostral das observações em <span class="math inline">\pi\_i</span>.</li>
+<li><span class="math inline">S_p</span> = <span class="math inline">\frac{(n_1-1)S_1 + (n_2-1)S_2}{n-2}</span> é a matriz de covariâncias combinada.</li>
 </ul>
 </section>
 <section id="projeção" class="level3">
 <h3 class="anchored" data-anchor-id="projeção">Projeção</h3>
-<p>Para <span class="math inline">\(\alpha, x \in \mathbb{R}^p\)</span>, definimos a projeção como:</p>
-<p><span class="math display">\[
+<p>Para <span class="math inline">\alpha, x \in \mathbb{R}^p</span>, definimos a projeção como:</p>
+<p><span class="math display">
 \begin{align}
 &amp; z = \alpha^T x
 \end{align}
-\]</span></p>
-<p>E consequentemente, as médias das populações <span class="math inline">\(\pi_1\)</span> e <span class="math inline">\(\pi_2\)</span> projetadas serão</p>
-<p><span class="math inline">\(\hat m_1 = \alpha^T \space \bar{x}_1\)</span></p>
-<p><span class="math inline">\(\hat m_2 = \alpha^T \space \bar{x}_1\)</span></p>
+</span></p>
+<p>E consequentemente, as médias das populações <span class="math inline">\pi_1</span> e <span class="math inline">\pi_2</span> projetadas serão</p>
+<p><span class="math inline">\hat m_1 = \alpha^T \space \bar{x}_1</span></p>
+<p><span class="math inline">\hat m_2 = \alpha^T \space \bar{x}_1</span></p>
 <p>E a diferença dessas projeções sendo</p>
-<p><span class="math inline">\(\hat m_1 - \hat m_2 = \alpha^T(\bar{x}_1 - \bar{x}_2)\)</span>.</p>
-<p>A variabilidade resultante na projeção é a variância da projeção <span class="math inline">\(z\)</span>, que é dada por</p>
-<p><span class="math display">\[
+<p><span class="math inline">\hat m_1 - \hat m_2 = \alpha^T(\bar{x}_1 - \bar{x}_2)</span>.</p>
+<p>A variabilidade resultante na projeção é a variância da projeção <span class="math inline">z</span>, que é dada por</p>
+<p><span class="math display">
 \begin{align}
     &amp; Var(z) = Var(\alpha^T x) \nonumber \\
     &amp; = \alpha^T \space Var(x) \space \alpha \nonumber \\
     &amp; = \alpha^T \mathcal{S}_p \space \alpha \nonumber
 \end{align}
-\]</span></p>
-<p>E então, <span class="math inline">\(\phi = \left(\frac{\hat m_1 - \hat m_2}{S_z}\right)^2 = \left(\frac{\alpha^T (\bar{x}_1 - \bar{x}_2)}{\sqrt{\alpha^T S_p \space \alpha}}\right)^2\)</span>.</p>
+</span></p>
+<p>E então, <span class="math inline">\phi = \left(\frac{\hat m_1 - \hat m_2}{S_z}\right)^2 = \left(\frac{\alpha^T (\bar{x}_1 - \bar{x}_2)}{\sqrt{\alpha^T S_p \space \alpha}}\right)^2</span>.</p>
 </section>
 <section id="maximização-da-distância" class="level3">
 <h3 class="anchored" data-anchor-id="maximização-da-distância">Maximização da Distância</h3>
-<p>Queremos encontrar a direção <span class="math inline">\(\alpha\)</span> que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção. Ou seja, queremos maximizar:</p>
-<p><span class="math display">\[
+<p>Queremos encontrar a direção <span class="math inline">\alpha</span> que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção. Ou seja, queremos maximizar:</p>
+<p><span class="math display">
 \begin{equation}
 \phi = \left(\frac{\alpha^T (\bar{x}_1 - \bar{x}_2)}{\sqrt{\alpha^T S_p \alpha}}\right)^2
 \end{equation}
-\]</span></p>
+</span></p>
 </section>
 </section>
 <section id="demonstração" class="level2">
 <h2 class="anchored" data-anchor-id="demonstração">Demonstração</h2>
-<p>Vamos aplicar a restrição <span class="math inline">\(\alpha^T S_p \space \alpha\)</span> constante e igual à <span class="math inline">\(1\)</span>, pois do contrário poderíamos ter <span class="math inline">\(\phi\)</span> tão grande quanto desejável. Nesse caso, então, vamos usar o método de Lagrange para otimização com restrição.</p>
+<p>Vamos aplicar a restrição <span class="math inline">\alpha^T S_p \space \alpha</span> constante e igual à <span class="math inline">1</span>, pois do contrário poderíamos ter <span class="math inline">\phi</span> tão grande quanto desejável. Nesse caso, então, vamos usar o método de Lagrange para otimização com restrição.</p>
 <p>Começamos com a expressão a ser maximizada:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \phi = \frac{(\alpha^T (\bar{x}_1 - \bar{x}_2))^2}{\alpha^T S_p \space \alpha}
-\]</span></p>
-<p>Para maximizar <span class="math inline">\(\phi\)</span>, usamos multiplicadores de Lagrange. Definimos a função Lagrangiana:</p>
-<p><span class="math display">\[
+</span></p>
+<p>Para maximizar <span class="math inline">\phi</span>, usamos multiplicadores de Lagrange. Definimos a função Lagrangiana:</p>
+<p><span class="math display">
 \mathcal{L}(\alpha, \lambda) = (\alpha^T (\bar{x}_1 - \bar{x}_2))^2 - \lambda (\alpha^T S_p \space \alpha - 1)
-\]</span></p>
-<p>Tomamos a derivada em relação a <span class="math inline">\(\alpha\)</span> e a igualamos a zero:</p>
-<p><span class="math display">\[
+</span></p>
+<p>Tomamos a derivada em relação a <span class="math inline">\alpha</span> e a igualamos a zero:</p>
+<p><span class="math display">
 \frac{\partial \mathcal{L}}{\partial \alpha} = 2 (\bar{x}_1 - \bar{x}_2) (\alpha^T (\bar{x}_1 - \bar{x}_2)) - \lambda 2 S_p \alpha = 0
-\]</span></p>
-<p>E agora, para <span class="math inline">\(\lambda\)</span>:</p>
-<p><span class="math display">\[
+</span></p>
+<p>E agora, para <span class="math inline">\lambda</span>:</p>
+<p><span class="math display">
 \frac{\partial \mathcal{L}}{\partial \lambda} = \alpha^T S_p \space \alpha - 1
-\]</span></p>
+</span></p>
 <p>O que nos fornece então o seguinte sistema de equações:</p>
-<p><span class="math display">\[
+<p><span class="math display">
 \begin{cases}
 \frac{\partial \mathcal{L}}{\partial \alpha} = 2 (\bar{x}_1 - \bar{x}_2) (\alpha^T (\bar{x}_1 - \bar{x}_2)) - \lambda 2 S_p \space \alpha = 0 \\
 \\
 \frac{\partial \mathcal{L}}{\partial \lambda} = \alpha^T S_p \space \alpha - 1
 \end{cases}
-\]</span></p>
+</span></p>
 <p>Da primeira equação, temos que</p>
-<p><span class="math display">\[
+<p><span class="math display">
 (\bar{x}_1 - \bar{x}_2) = \lambda S_p \space \alpha
-\]</span></p>
-<p>Para encontrar <span class="math inline">\(\lambda\)</span>, substituímos <span class="math inline">\(\alpha\)</span> na segunda equação de restrição:</p>
-<p><span class="math display">\[
+</span></p>
+<p>Para encontrar <span class="math inline">\lambda</span>, substituímos <span class="math inline">\alpha</span> na segunda equação de restrição:</p>
+<p><span class="math display">
 \begin{equation}
 (\bar{x}_1 - \bar{x}_2) = \lambda S_p \space \alpha \implies \alpha = \frac{S_p^{-1}(\bar{x}_1 - \bar{x}_2)}{\lambda}
 \end{equation}
-\]</span></p>
-<p>A partir da restrição <span class="math inline">\(\alpha^T S_p \space \alpha = 1\)</span>, temos:</p>
-<p><span class="math display">\[
+</span></p>
+<p>A partir da restrição <span class="math inline">\alpha^T S_p \space \alpha = 1</span>, temos:</p>
+<p><span class="math display">
 \begin{align}
 &amp; \left(\frac{S_p^{-1}(\bar{x}_1 - \bar{x}_2)}{\lambda}\right)^T S_p \left(\frac{S_p(\bar{x}_1 - \bar{x}_2)}{\lambda}\right) = 1 \nonumber \\
 &amp; \frac{1}{\lambda^2}(\bar{x}_1 - \bar{x}_2)^T S_p^{-1} \space S_p S_p^{-1} (\bar{x}_1 - \bar{x}_2) = 1 \nonumber \\
 &amp; \lambda^2 = (\bar{x}_1 - \bar{x}_2)^T S_p^{-1} (\bar{x}_1 - \bar{x}_2) \nonumber \\
 &amp; \lambda = \sqrt{(\bar{x}_1 - \bar{x}_2)^T S_p^{-1} (\bar{x}_1 - \bar{x}_2)}
 \end{align}
-\]</span></p>
-<p>E agora, substituindo <span class="math inline">\(\lambda\)</span> encontrado em (4) na equação de <span class="math inline">\(\alpha\)</span> (3), temos:</p>
-<p><span class="math display">\[
+</span></p>
+<p>E agora, substituindo <span class="math inline">\lambda</span> encontrado em (4) na equação de <span class="math inline">\alpha</span> (3), temos:</p>
+<p><span class="math display">
 \begin{equation}
 \alpha = \frac{S_p^{-1}(\bar{x}_1 - \bar{x}_2)}{\sqrt{(\bar{x}_1 - \bar{x}_2)^T S_p^{-1} (\bar{x}_1 - \bar{x}_2)}}
 \end{equation}
-\]</span></p>
-<p>Note que o denominador dessa equação é um escalar <span class="math inline">\(1x1\)</span>, e portanto, a direção de <span class="math inline">\(\alpha\)</span> que maximiza a diferença das duas populações é dada pelo vetor <span class="math inline">\(\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)\)</span> pelo método de otimização restrita de Lagrange.</p>
+</span></p>
+<p>Note que o denominador dessa equação é um escalar <span class="math inline">1x1</span>, e portanto, a direção de <span class="math inline">\alpha</span> que maximiza a diferença das duas populações é dada pelo vetor <span class="math inline">\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)</span> pelo método de otimização restrita de Lagrange.</p>
 </section>
 <section id="conclusão" class="level2">
 <h2 class="anchored" data-anchor-id="conclusão">Conclusão</h2>
-<p>Dessa forma, mostramos que a direção <span class="math inline">\(\alpha\)</span> que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção é a direção discriminante de Fisher.</p>
+<p>Dessa forma, mostramos que a direção <span class="math inline">\alpha</span> que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção é a direção discriminante de Fisher.</p>
 </section>
 </section>
 <section id="questão-2" class="level1">
@@ -666,7 +681,7 @@ NORUEGA        80</code></pre>
 </section>
 <section id="cortando-as-árvores" class="level2">
 <h2 class="anchored" data-anchor-id="cortando-as-árvores">cortando as árvores</h2>
-<p>Cortando as árvores referente ao <span class="math inline">\(complete \quad linkage\)</span> com as variáveis leite e fruta/legumes</p>
+<p>Cortando as árvores referente ao <span class="math inline">complete \quad linkage</span> com as variáveis leite e fruta/legumes</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">#k=2</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>clustersFL_2 <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc_FL, <span class="at">k =</span> <span class="dv">2</span>)</span>
@@ -692,7 +707,7 @@ MEXICO                  1       1       MEXICO
 HUNGRIA                 1       1      HUNGRIA</code></pre>
 </div>
 </div>
-<p>Cortando as árvores referente a <span class="math inline">\(complete \quad linkage\)</span> com todas variáveis</p>
+<p>Cortando as árvores referente a <span class="math inline">complete \quad linkage</span> com todas variáveis</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#k = 2</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>clustersAll_2 <span class="ot">&lt;-</span> <span class="fu">cutree</span>(hc_All, <span class="at">k =</span> <span class="dv">2</span>)</span>

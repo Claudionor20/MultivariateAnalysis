@@ -1,10 +1,7 @@
 # Leitura da base de dados pelo github
 
-ips_componentes = read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/ips_componentes1620.csv")
-ips_componentes = ips_componentes[,-1]
+ips= read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/IPS.csv", sep = ';')
 
-ips_indicadores = read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/ips_indicadores1620.csv")
-ips_indicadores = ips_indicadores[,-1]
 
 # Importando pacotes
 
@@ -13,19 +10,13 @@ library(ggplot2)
 library(reshape2)
 library(corrplot)
 
-# Fazendo left join das duas bases de dados
-
-ips <- ips_componentes|>
-  dplyr::left_join(ips_indicadores, by = c("ano", "regiao_administrativa"))
-
-
 ######### ANÁLISE DESCRITIVA #########
 
 # Média de IPS ao longo dos anos por região administrativa
 
 ips |>
-  group_by(regiao_administrativa) %>%
-  summarise(media_ips = mean(ips_geral)) %>%
+  group_by(regiao_administrativa) |>
+  summarise(media_ips = mean(ips_geral)) |>
   arrange(desc(media_ips)) %>%
   ggplot(aes(x = reorder(regiao_administrativa, media_ips), y = media_ips)) +
   geom_bar(stat = "identity", fill = "blue") +
