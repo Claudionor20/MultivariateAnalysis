@@ -86,5 +86,39 @@ variaveis_correlacionadas <- findCorrelation(correlacao_sem_ips, cutoff = 0.7)
 nomes_variaveis_correlacionadas <- colnames(base_sem_ips)[variaveis_correlacionadas]
 print(nomes_variaveis_correlacionadas)
 
+#### PCA ####
 
 
+library(ggplot2)
+library(FactoMineR)
+library(factoextra)
+
+# Remover a coluna das espécies, pois é uma variável categórica
+IPS_d <- ips[, c(-1,-2,-3)]
+
+# Padronizar as variáveis
+ips_pad <- scale(IPS_d)
+
+# Executar a PCA
+pca_result <- PCA(ips_pad, graph = FALSE)
+pca_result$eig #81.85067% com 10 componentes
+
+var_out <- get_pca_var(pca_result)
+
+loadings <- var_out$coord
+View(loadings)
+
+#O primeiro Componente é a diferença entre qualidade, regiões com scores positivos tem maior qualidade de vida já os negativos pior qualidade, ou seja quanto maior score melhor qualidade de vida, quando menor o socre pior qualidade
+#Em suma o primeiro pca verifica as regios quem possuem mais recursos
+#o segundo representa um componente que relaciona segurança, criminalidade, liberdades individuais e acesso a serviços urbanos ( porra não consegui interpretar melhor n )
+#o terceiro representa o acesso ao saneamento basico
+#o quarto representa a vulnerabilidade social e direitos individuais?????????????????????
+#o quinto representa saúde e qualidade ambiental?????????
+
+fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 50),main = "")
+
+fviz_pca_var(pca_result, axes = c(1,2),col.var = "black",repel = TRUE) 
+
+fviz_pca_ind(pca_result, axes = c(1,2))
+
+fviz_pca_biplot(pca_result,addlabels = TRUE)
