@@ -8,6 +8,8 @@ format:
   html:
     theme: default
     toc: true
+    html-math-method: katex
+    css: styles.css
     toc-location: left
 editor_options: 
   markdown: 

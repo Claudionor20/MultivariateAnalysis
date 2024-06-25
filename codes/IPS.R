@@ -18,7 +18,7 @@ library(corrplot)
 ips <- ips_componentes|>
   dplyr::left_join(ips_indicadores, by = c("ano", "regiao_administrativa"))
 
-
+write.csv(ips, "ips.csv", row.names = FALSE)
 ######### ANÁLISE DESCRITIVA #########
 
 # Média de IPS ao longo dos anos por região administrativa
