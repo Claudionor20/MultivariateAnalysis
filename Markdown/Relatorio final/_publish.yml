@@ -1,0 +1,4 @@
+- source: Relatorio final.qmd
+  quarto-pub:
+    - id: b338024c-51df-44d0-886b-9df171d4c212
+      url: 'https://caiofalcao05.quarto.pub/relatorio-final'

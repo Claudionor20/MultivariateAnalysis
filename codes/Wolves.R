@@ -1,21 +1,19 @@
 #### Pacotes ####
 
-if (!require(candisc)) {
-  install.packages("candisc")
-  library(candisc)
-}
 library(candisc)
 library(dplyr)
 library(ggplot2)
-install.packages("cluster")
 library(cluster)
+library(gridExtra)
+library(factoextra)
+
 ####Base de dados  ####
 data(Wolves)
 str(Wolves)
 
 naniar::miss_var_summary(Wolves)
 
-##### Análise exploratória (2A): ####
+#### Análise exploratória (2A): ####
 
 #
 
@@ -62,7 +60,6 @@ for (i in 1:ncol(Wolves)) {
     plots[[length(plots) + 1]] <- p
   }
 }
-library(gridExtra)
 do.call("grid.arrange", c(plots, ncol = 3))
 
 # Análise de correlação
@@ -108,7 +105,6 @@ confusionmatrix(predict(spe.lda)$class, Wolves$group)
 
 
 #### K-means (2C) ####
-library(factoextra)
 Wolves
 X = Wolves[,-c(1:3)]
 
@@ -150,50 +146,10 @@ Xh = Xh |>
   mutate(across(c(location,sex), as.numeric))
 
 Xh = scale(Xh)
+
 dist_matrix <- dist(Xh)
 
-# Step 3: Perform hierarchical clustering using complete linkage
 hc_complete <- hclust(dist_matrix, method = "complete")
 
-# Step 4: Plot the dendrogram
 plot(hc_complete, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
-
-##como factor
-
-XF = Wolves[,-1]
-XF$location = ifelse(XF$location == "rm", 1,0)
-XF$sex = ifelse(XF$sex == "m", 1,0)
-XF = XF |> 
-  mutate(across(c(location,sex), as.factor),
-         across(c(4:11), as.numeric))
-
-XF[3:11] = scale(XF[3:11])
-
-str(XF)
-dist_matrixF <- daisy(XF, metric  = "gower")
-
-# Step 3: Perform hierarchical clustering using complete linkage
-hc_completeF <- hclust(dist_matrix, method = "complete")
-
-# Step 4: Plot the dendrogram
-plot(hc_completeF, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
-
-## sem as duas primeiras 
-
-Xp = XF[,c(-1,-2)]
-Xp <- scale(Xp)
-
-dist_matrixp <- dist(Xp)
-
-# Step 3: Perform hierarchical clustering using complete linkage
-hc_completep <- hclust(dist_matrixp, method = "complete")
-
-# Step 4: Plot the dendrogram
-plot(hc_completep, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
-
-#
-par(mfrow = c(3,1))
-plot(hc_complete, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
-plot(hc_completeF, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
-plot(hc_completep, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
 
