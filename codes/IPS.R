@@ -11,7 +11,7 @@ library(reshape2)
 library(corrplot)
 library(caret)
 library(tidyr)
-
+library(sf)
 ######### ANÁLISE DESCRITIVA #########
 
 # Média de IPS ao longo dos anos por região administrativa
@@ -101,6 +101,31 @@ ggplot(ips_long, aes(x = as.factor(ano), y = valor, group = interaction(ano, var
   theme(legend.position = "none") +
   labs(title = "Indicadores ao Longo do Tempo",
        x = "Ano", y = "Valor")
+
+# Mapa de calor IPS
+dados_geojson <- st_read("mapa.geojson")
+dados_ips_2020 <- ips[ips$ano == 2020, ]
+# Substituir Maré por Complexo da Maré
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Maré"] <- "Complexo da Maré"
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Iraja"] <- "Irajá"
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Portuaria"] <- "Portuária"
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "São Cristovão"] <- "São Cristóvão"
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Barra Da Tijuca"] <- "Barra da Tijuca"
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Cidade De Deus"] <- "Cidade de Deus"
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Complexo Do Alemão"] <- "Complexo do Alemão"
+dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Ilha Do Governador"] <- "Ilha do Governador"
+
+# Achar um shapefile melhor se pá! Já que na base do shapefile tem Páqueta e não tem Rio de Janeiro
+
+
+regioes_ips_2020 <- merge(dados_geojson, dados_ips_2020, by.x = "nomera", by.y = "regiao_administrativa")
+
+ggplot() +
+  geom_sf(data = regioes_ips_2020, aes(fill = ips_geral)) +
+  scale_fill_gradient(low = "white", high = "red", name = "IPS Geral") +
+  theme_minimal() +
+  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2020)")
+
 
 
 # Fazendo correlação entre as variáveis
