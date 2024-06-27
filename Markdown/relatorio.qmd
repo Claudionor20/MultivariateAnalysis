@@ -381,24 +381,11 @@ library(corrplot)
 ```
 
 ```{r basesIPS}
-ips_componentes = read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/ips_componentes1620.csv")
-ips_componentes = ips_componentes[,-1]
+ips =  read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/IPS.csv", sep = ';')
 
-head(ips_componentes)
-
-ips_indicadores = read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/ips_indicadores1620.csv")
-ips_indicadores = ips_indicadores[,-1]
-
-head(ips_indicadores)
-```
-
-Agrupando as bases de dados:
-
-```{r leftjoin}
-ips <- ips_componentes|>
-  dplyr::left_join(ips_indicadores, by = c("ano", "regiao_administrativa"))
 head(ips)
 ```
+
 
 ## Análise Descritiva de Dados
 
