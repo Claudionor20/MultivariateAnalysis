@@ -160,6 +160,8 @@ library(cluster)
 library(gridExtra)
 library(factoextra)
 library(mclust)
+library(MVN)
+
 ```
 
 Após realizar a importação da base de dados, verificamos se a base possui valores faltantes e se as variáveis estão corretamente formatadas: 
@@ -244,21 +246,19 @@ do.call("grid.arrange", c(plots, ncol = 3))
 O primeiro passo para realizar a análise de discriminante é verificar a normalidade dos dados.
 
 ```{r teste de normalidade}
-head(Wolves)
-
 N_W <- Wolves[,4:length(Wolves)]
 
 
-#mvn(data = N_W, mvnTest = "mardia", multivariatePlot = "qq") #Conjuntamente segue normalmultivariada, ou seja, os grupos seguem normal multivarida.
+MVN::mvn(data = N_W, mvnTest = "mardia", multivariatePlot = "qq") #Conjuntamente segue normalmultivariada, ou seja, os grupos seguem normal multivarida.
 
 ```
 
 ```{r}
 
-'X<-as.matrix(Wolves[,c(-1,-2,-3)])
+X<-as.matrix(Wolves[,c(-1,-2,-3)])
 X_d <- dist(X)
-X <- betadisper(X_d,Wolves$group)
-permutest(X) # Matriz de covariancias são homogeneas
+X <- vegan::betadisper(X_d,Wolves$group)
+vegan::permutest(X) # Matriz de covariancias são homogeneas
 plot(X)
 
 
@@ -275,7 +275,7 @@ ta <- table(Wolves[,1],predict(spe.lda)$class)
 
 diag(prop.table(ta,1))
 
-confusionmatrix(predict(spe.lda)$class, Wolves$group)'
+caret::confusionMatrix(predict(spe.lda)$class, Wolves$group)
 ```
 
 

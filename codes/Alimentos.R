@@ -38,7 +38,7 @@ clustersFL_2 <- cutree(hc_FL, k = 2)
 cluster_fl2 = data.frame(clustersFL_2)
 cluster_fl2$cluster <- clustersFL_2
 cluster_fl2$pais = dados$pais
-cluster_fl2
+cluster_fl2 
 
 #k = 3
 clustersFL_3 <- cutree(hc_FL, k = 3)
