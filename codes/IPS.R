@@ -4,6 +4,11 @@
 
 ips= read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/IPS.csv", sep = ';')
 
+ips_anos = list(ips_2016 = filter(ips, ano == 2016), 
+                ips_2018 = filter(ips, ano == 2018),
+                ips_2020 = filter(ips, ano == 2020), 
+                ips_2022 = filter(ips, ano == 2022))
+
 names(ips)
 # Importando pacotes
 
@@ -163,17 +168,25 @@ library(FactoMineR)
 library(factoextra)
 
 # Remover a coluna das espécies, pois é uma variável categórica
-IPS_d <- dados_ips_2020[, c(-1,-2)]
+IPS_d <- ips_anos$ips_2016[,-c(1,2,3)]
+rownames(IPS_d) = ips_anos$ips_2016$regiao_administrativa
 # Executar a PCA
-pca_result <- PCA(IPS_d, scale.unit = TRUE, ncp=36, quanti.sup=c(1) ,graph = FALSE)
+pca_result <- PCA(IPS_d, scale.unit = TRUE, ncp=36 ,graph = FALSE)
 pca_result$eig #81.85067% com 10 componentes # Claudio'nor: A gente teria que explicar quais variaveis explicam esses 10 compontentes? Se sim, acho muito difícil
 
 var_out <- get_pca_var(pca_result)
 
 loadings <- var_out$coord
-View(loadings)
+#
+rownames(ips_anos$ips_2018) = ips_anos$ips_2016$regiao_administrativa
+rownames(ips_anos$ips_2020) = ips_anos$ips_2016$regiao_administrativa
+rownames(ips_anos$ips_2022) = ips_anos$ips_2016$regiao_administrativa
 
-row.names(loadings)
+scores_2016 <- predict(pca_result, newdata = IPS_d)$coord
+scores_2018 <- predict(pca_result, newdata = ips_anos$ips_2018[,-c(1,2,3)])$coord
+scores_2020 <- predict(pca_result, newdata = ips_anos$ips_2020[,-c(1,2,3)])$coord
+scores_2022 <- predict(pca_result, newdata = ips_anos$ips_2022[,-c(1,2,3)])$coord
+
 
 #O primeiro Componente é a diferença entre qualidade, regiões com scores positivos tem maior qualidade de vida já os negativos pior qualidade, ou seja quanto maior score melhor qualidade de vida, quando menor o socre pior qualidade 
 #Em suma o primeiro pca verifica as regios quem possuem mais recursos #Claudio'nor: Concordo
@@ -209,11 +222,11 @@ IPS_d_norm <- scale(IPS_d)
 
 # Executar o k-means
 set.seed(123) # Para reprodutibilidade
-kmeans_result <- kmeans(IPS_d_norm, centers = 4)
+kmeans_result <- kmeans(IPS_d_norm, centers = 3)
 
 # Adicionar os resultados do cluster ao dataframe
 IPS_d$cluster <- as.factor(kmeans_result$cluster)
-
+row.names(IPS_d) = ips_anos$ips_2016$regiao_administrativa
 # Visualizar os clusters
 ggplot(IPS_d, aes(x = PC1, y = PC2, color = cluster)) +
   geom_point() +
@@ -291,10 +304,7 @@ for (plot in plots) {
 #### Agrupamentos hierarquicos ####
 
 #####Agrupando utilizando todas as variáveis #####
-ips_anos = list(ips_2016 = filter(ips, ano == 2016), 
-                ips_2018 = filter(ips, ano == 2018),
-                ips_2020 = filter(ips, ano == 2020), 
-                ips_2022 = filter(ips, ano == 2022))
+
 
 ips_c = ips_anos[["ips_2016"]][c(-1,-2,-3)]
 ips_c = scale(ips_c)
@@ -307,14 +317,12 @@ par(mfrow = c(1,1))
 plot(cluster_ips, main = "single")
 
 cluster_ips2 = hclust(dist_ipsc, method = "complete")
-
-plot(cluster_ips2, main = "complete")
+#
 
 cluster_ips3 = hclust(dist_ipsc, method = "average")
 
 plot(cluster_ips3, main = "avg")
-
-clusters_ips <- cutree(cluster_ips2, k = 5)
+clusters_ips <- cutree(cluster_ips2, k = 3)
 
 fviz_cluster(list(data = ips_c, cluster = clusters_ips), 
              geom = "point", 
@@ -322,7 +330,37 @@ fviz_cluster(list(data = ips_c, cluster = clusters_ips),
              palette = "jco", 
              ggtheme = theme_minimal()) + 
   geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
+  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
   labs(title = "")
+
+fviz_cluster(list(data = ips_anos[["ips_2018"]][c(-1,-2,-3)], cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
+  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
+  labs(title = "")
+
+fviz_cluster(list(data = ips_anos[["ips_2020"]][c(-1,-2,-3)], cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
+  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
+  labs(title = "")
+
+fviz_cluster(list(data = ips_anos[["ips_2022"]][c(-1,-2,-3)], cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
+  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
+  labs(title = "")
+
+
 
 #####
 
