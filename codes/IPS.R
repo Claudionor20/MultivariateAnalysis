@@ -14,6 +14,7 @@ library(corrplot)
 library(caret)
 library(tidyr)
 library(sf)
+
 #### ANÁLISE DESCRITIVA ####
 
 # Média de IPS ao longo dos anos por região administrativa
@@ -122,11 +123,22 @@ dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Il
 
 regioes_ips_2020 <- merge(dados_geojson, dados_ips_2020, by.x = "nomera", by.y = "regiao_administrativa")
 
+# Crie o mapa de calor com as siglas
 ggplot() +
   geom_sf(data = regioes_ips_2020, aes(fill = ips_geral)) +
-  scale_fill_gradient(low = "white", high = "red", name = "IPS Geral") +
+  geom_sf_text(data = regioes_ips_2020, aes(label = nomera), 
+               size = 3.5, color = "black", fontface = "bold", 
+               check_overlap = TRUE) +
+  scale_fill_gradientn(
+    colors = c("white", "pink", "red"),
+    values = scales::rescale(c(45, 50, 90)), # Ajuste os valores conforme necessário
+    name = "IPS Geral"
+  ) +
   theme_minimal() +
-  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2020)")
+  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2020)") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 10))
 
 
 
@@ -151,8 +163,7 @@ library(FactoMineR)
 library(factoextra)
 
 # Remover a coluna das espécies, pois é uma variável categórica
-IPS_d <- ips[, c(-1,-2)]
-
+IPS_d <- dados_ips_2020[, c(-1,-2)]
 # Executar a PCA
 pca_result <- PCA(IPS_d, scale.unit = TRUE, ncp=36, quanti.sup=c(1) ,graph = FALSE)
 pca_result$eig #81.85067% com 10 componentes # Claudio'nor: A gente teria que explicar quais variaveis explicam esses 10 compontentes? Se sim, acho muito difícil
@@ -183,7 +194,33 @@ fviz_pca_var(pca_result, axes = c(1,2),col.var = "black",repel = TRUE)  # Claudi
 fviz_pca_ind(pca_result, axes = c(1,2)) #
 
 fviz_pca_biplot(pca_result,addlabels = TRUE) #Claudio'nor: Aqui se pá tem que escolher 1 ano e ver como a região se comporta em relação aos componentes
-                                        # Se for interessante, cabe 3 gráficos e análisar a evolução (Bom que da prá ver a mudança da variável mais impactante em um estado ao longo do tempo)
+                                     # Se for interessante, cabe 3 gráficos e análisar a evolução (Bom que da prá ver a mudança da variável mais impactante em um estado ao longo do tempo)
+
+
+# Fazendo uma análise de cluster com as componentes do pca
+
+# Extraindo os PC's
+IPS_d$PC1 <- pca_result$ind$coord[,1]
+IPS_d$PC2 <- pca_result$ind$coord[,2]
+IPS_d$PC3 <- pca_result$ind$coord[,3]
+
+# Normalizar os dados
+IPS_d_norm <- scale(IPS_d)
+
+# Executar o k-means
+set.seed(123) # Para reprodutibilidade
+kmeans_result <- kmeans(IPS_d_norm, centers = 4)
+
+# Adicionar os resultados do cluster ao dataframe
+IPS_d$cluster <- as.factor(kmeans_result$cluster)
+
+# Visualizar os clusters
+ggplot(IPS_d, aes(x = PC1, y = PC2, color = cluster)) +
+  geom_point() +
+  labs(title = "Clusters de Regiões Administrativas",
+       x = "Primeiro Componente do PCA",
+       y = "Segundo Componente do PCA") +
+  theme_minimal()
 
 #### Agrupamento por k-means ####
 
