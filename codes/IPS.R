@@ -163,31 +163,39 @@ nomes_variaveis_correlacionadas <- colnames(base_sem_ips)[variaveis_correlaciona
 print(nomes_variaveis_correlacionadas)
 
 #### PCA ####
+library(dplyr)
+library(tidyr)
 library(ggplot2)
-library(FactoMineR)
-library(factoextra)
 
 # Remover a coluna das espécies, pois é uma variável categórica
 IPS_d <- ips_anos$ips_2016[,-c(1,2,3)]
 rownames(IPS_d) = ips_anos$ips_2016$regiao_administrativa
 # Executar a PCA
-pca_result <- PCA(IPS_d, scale.unit = TRUE, ncp=36 ,graph = FALSE)
-pca_result$eig #81.85067% com 10 componentes # Claudio'nor: A gente teria que explicar quais variaveis explicam esses 10 compontentes? Se sim, acho muito difícil
+pca_prcomp <- prcomp(IPS_d, scale. = TRUE)
 
-var_out <- get_pca_var(pca_result)
+# Usando PCA do FactoMineR
+library(FactoMineR)
+pca_factominer <- PCA(IPS_d, scale.unit = TRUE, graph = FALSE)
 
-loadings <- var_out$coord
+# Comparando as cargas
+carga1 = print(pca_prcomp$rotation)
+carga2 = print(pca_factominer$var$coord)
+
+# Comparando os scores
+print(head(pca_prcomp$x))
+print(head(pca_factominer$ind$coord))
 #
 rownames(ips_anos$ips_2018) = ips_anos$ips_2016$regiao_administrativa
 rownames(ips_anos$ips_2020) = ips_anos$ips_2016$regiao_administrativa
 rownames(ips_anos$ips_2022) = ips_anos$ips_2016$regiao_administrativa
 
-scores_2016 <- predict(pca_result, newdata = IPS_d)$coord
-scores_2018 <- predict(pca_result, newdata = ips_anos$ips_2018[,-c(1,2,3)])$coord
-scores_2020 <- predict(pca_result, newdata = ips_anos$ips_2020[,-c(1,2,3)])$coord
-scores_2022 <- predict(pca_result, newdata = ips_anos$ips_2022[,-c(1,2,3)])$coord
+# Centralizar e escalar os novos dados
+ips2018 <- scale(ips_anos$ips_2018[-c(,)], 
+                            center = pca_result$call$centre, 
+                            scale = pca_result$call$ecart.type)
 
-
+# Calculando os novos scores
+novos_scores <- as.matrix(novos_dados_scaled) %*% pca_result$var$coord
 #O primeiro Componente é a diferença entre qualidade, regiões com scores positivos tem maior qualidade de vida já os negativos pior qualidade, ou seja quanto maior score melhor qualidade de vida, quando menor o socre pior qualidade 
 #Em suma o primeiro pca verifica as regios quem possuem mais recursos #Claudio'nor: Concordo
 
