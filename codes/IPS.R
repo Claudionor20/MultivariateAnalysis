@@ -325,7 +325,17 @@ cluster_ips3 = hclust(dist_ipsc, method = "average")
 plot(cluster_ips3, main = "avg")
 clusters_ips <- cutree(cluster_ips2, k = 3)
 
-fviz_cluster(list(data = ips_c, cluster = clusters_ips), 
+fviz_cluster(list(data = scores_2016, cluster = clusters_ips), 
+             choose.vars = c("Dim.1", "Dim.2"),
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
+  labs(title = "")
+
+fviz_cluster(list(data = scores_2018, cluster = clusters_ips), 
+             choose.vars = c("Dim.1", "Dim.2"),
              geom = "point", 
              ellipse.type = "convex", 
              palette = "jco", 
@@ -334,25 +344,17 @@ fviz_cluster(list(data = ips_c, cluster = clusters_ips),
   scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
   labs(title = "")
 
-fviz_cluster(list(data = ips_anos[["ips_2018"]][c(-1,-2,-3)], cluster = clusters_ips), 
+fviz_cluster(list(data = scores_2020, cluster = clusters_ips), 
+             choose.vars = c("Dim.1", "Dim.2"),
              geom = "point", 
              ellipse.type = "convex", 
              palette = "jco", 
              ggtheme = theme_minimal()) + 
   geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
-  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
   labs(title = "")
 
-fviz_cluster(list(data = ips_anos[["ips_2020"]][c(-1,-2,-3)], cluster = clusters_ips), 
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
-  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
-  labs(title = "")
-
-fviz_cluster(list(data = ips_anos[["ips_2022"]][c(-1,-2,-3)], cluster = clusters_ips), 
+fviz_cluster(list(data = scores_2022, cluster = clusters_ips), 
+             choose.vars = c("Dim.1", "Dim.2"),
              geom = "point", 
              ellipse.type = "convex", 
              palette = "jco", 
