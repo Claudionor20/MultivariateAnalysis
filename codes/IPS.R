@@ -167,56 +167,49 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-# Remover a coluna das espécies, pois é uma variável categórica
-IPS_d <- ips_anos$ips_2016[,-c(1,2,3)]
-rownames(IPS_d) = ips_anos$ips_2016$regiao_administrativa
+# Remover colunas categóricas e escalar os dados
+IPS_d <- scale(ips_anos$ips_2016[,-c(1,2,3)])
+rownames(IPS_d) <- ips_anos$ips_2016$regiao_administrativa
+
 # Executar a PCA
-pca_prcomp <- prcomp(IPS_d, scale. = TRUE)
+pca_result <- PCA(IPS_d, ncp = ncol(IPS_d), graph = FALSE)
+var_out <- get_pca_var(pca_result)
+loadings <- var_out$coord
 
-# Usando PCA do FactoMineR
-library(FactoMineR)
-pca_factominer <- PCA(IPS_d, scale.unit = TRUE, graph = FALSE)
+# Calcular scores manualmente multiplicando a matriz original escalada pelos loadings
+scores_2016 <- as.data.frame(as.matrix(IPS_d) %*% as.matrix(loadings))
 
-# Comparando as cargas
-carga1 = print(pca_prcomp$rotation)
-carga2 = print(pca_factominer$var$coord)
+# Garantir que os nomes das linhas sejam consistentes para outros anos
+rownames(ips_anos$ips_2018) <- ips_anos$ips_2016$regiao_administrativa
+rownames(ips_anos$ips_2020) <- ips_anos$ips_2016$regiao_administrativa
+rownames(ips_anos$ips_2022) <- ips_anos$ips_2016$regiao_administrativa
 
-# Comparando os scores
-print(head(pca_prcomp$x))
-print(head(pca_factominer$ind$coord))
-#
-rownames(ips_anos$ips_2018) = ips_anos$ips_2016$regiao_administrativa
-rownames(ips_anos$ips_2020) = ips_anos$ips_2016$regiao_administrativa
-rownames(ips_anos$ips_2022) = ips_anos$ips_2016$regiao_administrativa
+# Escalar os dados de outros anos
+IPS_2018 <- scale(ips_anos$ips_2018[,-c(1,2,3)])
+IPS_2020 <- scale(ips_anos$ips_2020[,-c(1,2,3)])
+IPS_2022 <- scale(ips_anos$ips_2022[,-c(1,2,3)])
 
-# Centralizar e escalar os novos dados
-ips2018 <- scale(ips_anos$ips_2018[-c(,)], 
-                            center = pca_result$call$centre, 
-                            scale = pca_result$call$ecart.type)
+# Calcular scores para outros anos
+scores_2018 <- as.data.frame(as.matrix(IPS_2018) %*% as.matrix(loadings))
 
-# Calculando os novos scores
-novos_scores <- as.matrix(novos_dados_scaled) %*% pca_result$var$coord
-#O primeiro Componente é a diferença entre qualidade, regiões com scores positivos tem maior qualidade de vida já os negativos pior qualidade, ou seja quanto maior score melhor qualidade de vida, quando menor o socre pior qualidade 
-#Em suma o primeiro pca verifica as regios quem possuem mais recursos #Claudio'nor: Concordo
+scores_2020 <- as.data.frame(as.matrix(IPS_2020) %*% as.matrix(loadings))
 
-#o segundo representa um componente que relaciona segurança, criminalidade, liberdades individuais e acesso a serviços urbanos ( porra não consegui interpretar melhor n ) #Claudio'nor: Acho que só criminalidade já é bem explicativo
-#o terceiro representa o acesso ao saneamento basico
-#o quarto representa a vulnerabilidade social e direitos individuais????????????????????? #Claudio'nor: Eu achei que esse componente tem uma pegada de avaliar a vida urbana, já que ele tem variáveis de mobilidade urbana, crise respiratório (pode ser associado ao ambiente urbano),
-                                                                                          # população vivendo em favela não urbanizada, etcc                                              
-#o quinto representa saúde e qualidade ambiental??????????
+scores_2022 <- as.data.frame(as.matrix(IPS_2022) %*% as.matrix(loadings))
 
+
+
+pca_result_2018 <- PCA(IPS_2018, ncp = ncol(IPS_2018), graph = FALSE)
+var_out_2018 <- get_pca_var(pca_result_2018)
+loadings_2018 <- var_out_2018$coord
 
 
 fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 50),main = "") #gráficos
 
-fviz_pca_var(pca_result, axes = c(1,2),col.var = "black",repel = TRUE)  # Claudio'nor: Apesar de parecer uma teia de aranha, esse gráfico com a variável ips_geral destacada, mostra que ela é altamente influenciada
-                                                                        # pelo primeiro componente, legal que são as mesma variaveis que tem maior correlação com ela, como foi visto na análise descritiva
+fviz_pca_var(pca_result, axes = c(1,2),col.var = "black",repel = TRUE) 
 
-fviz_pca_ind(pca_result, axes = c(1,2)) #
+fviz_pca_ind(pca_result, axes = c(1,2)) 
 
-fviz_pca_biplot(pca_result,addlabels = TRUE) #Claudio'nor: Aqui se pá tem que escolher 1 ano e ver como a região se comporta em relação aos componentes
-                                     # Se for interessante, cabe 3 gráficos e análisar a evolução (Bom que da prá ver a mudança da variável mais impactante em um estado ao longo do tempo)
-
+fviz_pca_biplot(pca_result,addlabels = TRUE) 
 
 # Fazendo uma análise de cluster com as componentes do pca
 
