@@ -112,7 +112,7 @@ ggplot(ips_long, aes(x = as.factor(ano), y = valor, group = interaction(ano, var
 
 # Mapa de calor IPS
 dados_geojson <- st_read("mapa.geojson")
-dados_ips_2020 <- ips[ips$ano == 2020, ]
+dados_ips_2020 <- ips[ips$ano == 2018, ]
 # Substituir Maré por Complexo da Maré
 dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Maré"] <- "Complexo da Maré"
 dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Iraja"] <- "Irajá"
@@ -127,20 +127,20 @@ dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Il
 
 
 regioes_ips_2020 <- merge(dados_geojson, dados_ips_2020, by.x = "nomera", by.y = "regiao_administrativa")
+library(RColorBrewer)
 
-# Crie o mapa de calor com as siglas
 ggplot() +
   geom_sf(data = regioes_ips_2020, aes(fill = ips_geral)) +
   geom_sf_text(data = regioes_ips_2020, aes(label = nomera), 
                size = 3.5, color = "black", fontface = "bold", 
                check_overlap = TRUE) +
   scale_fill_gradientn(
-    colors = c("white", "pink", "red"),
-    values = scales::rescale(c(45, 50, 90)), # Ajuste os valores conforme necessário
+    colors = brewer.pal(9, "BuPu"),
+    values = scales::rescale(c(min(regioes_ips_2020$ips_geral), max(regioes_ips_2020$ips_geral))),
     name = "IPS Geral"
   ) +
   theme_minimal() +
-  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2020)") +
+  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2016)") +
   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
         legend.title = element_text(size = 12),
         legend.text = element_text(size = 10))
@@ -211,30 +211,6 @@ fviz_pca_ind(pca_result, axes = c(1,2))
 
 fviz_pca_biplot(pca_result,addlabels = TRUE) 
 
-# Fazendo uma análise de cluster com as componentes do pca
-
-# Extraindo os PC's
-IPS_d$PC1 <- pca_result$ind$coord[,1]
-IPS_d$PC2 <- pca_result$ind$coord[,2]
-IPS_d$PC3 <- pca_result$ind$coord[,3]
-
-# Normalizar os dados
-IPS_d_norm <- scale(IPS_d)
-
-# Executar o k-means
-set.seed(123) # Para reprodutibilidade
-kmeans_result <- kmeans(IPS_d_norm, centers = 3)
-
-# Adicionar os resultados do cluster ao dataframe
-IPS_d$cluster <- as.factor(kmeans_result$cluster)
-row.names(IPS_d) = ips_anos$ips_2016$regiao_administrativa
-# Visualizar os clusters
-ggplot(IPS_d, aes(x = PC1, y = PC2, color = cluster)) +
-  geom_point() +
-  labs(title = "Clusters de Regiões Administrativas",
-       x = "Primeiro Componente do PCA",
-       y = "Segundo Componente do PCA") +
-  theme_minimal()
 
 #### Agrupamento por k-means ####
 
@@ -318,51 +294,80 @@ par(mfrow = c(1,1))
 plot(cluster_ips, main = "single")
 
 cluster_ips2 = hclust(dist_ipsc, method = "complete")
-#
+plot(cluster_ips2, main = "complete")
 
 cluster_ips3 = hclust(dist_ipsc, method = "average")
 
 plot(cluster_ips3, main = "avg")
 clusters_ips <- cutree(cluster_ips2, k = 3)
 
-fviz_cluster(list(data = scores_2016, cluster = clusters_ips), 
-             choose.vars = c("Dim.1", "Dim.2"),
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
-  labs(title = "")
+# Adicionar os clusters aos scores
+scores_2016$cluster <- as.factor(clusters_ips)
+scores_2018$cluster <- as.factor(clusters_ips)
+scores_2020$cluster <- as.factor(clusters_ips)
+scores_2022$cluster <- as.factor(clusters_ips)
 
-fviz_cluster(list(data = scores_2018, cluster = clusters_ips), 
-             choose.vars = c("Dim.1", "Dim.2"),
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
-  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
-  labs(title = "")
+# Função para criar o contorno de um cluster
+hull <- function(df) df[chull(df$Dim.1, df$Dim.2), ]
 
-fviz_cluster(list(data = scores_2020, cluster = clusters_ips), 
-             choose.vars = c("Dim.1", "Dim.2"),
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
-  labs(title = "")
+# Aplicar a função para cada cluster
+hulls <- scores_2016 %>%
+  group_by(cluster) %>%
+  do(hull(.))
 
-fviz_cluster(list(data = scores_2022, cluster = clusters_ips), 
-             choose.vars = c("Dim.1", "Dim.2"),
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = ips_anos$ips_2016$regiao_administrativa), vjust = -0.5, hjust = 0.5)+
-  scale_y_continuous(breaks = c(-5,10,1), limits = c(-5,10))+
-  labs(title = "")
+# Visualizar os clusters usando as componentes principais desejadas
+# Exemplo: Usar PC1 e PC2 como eixos x e y
+ggplot() +
+  geom_polygon(data = hulls, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
+  geom_point(data = scores_2016, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
+  geom_text(data = scores_2016, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2016)), vjust = -0.5, hjust = 0.5, size = 3) +
+  labs(title = "Cluster Visualization 2016", x = "PC1", y = "PC2") +
+  theme_minimal() +
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
 
+hulls2018 <- scores_2018 %>%
+  group_by(cluster) %>%
+  do(hull(.))
+
+
+ggplot() +
+  geom_polygon(data = hulls2018, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
+  geom_point(data = scores_2018, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
+  geom_text(data = scores_2018, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2018)), vjust = -0.5, hjust = 0.5, size = 3) +
+  labs(title = "Cluster Visualization 2018", x = "PC1", y = "PC2") +
+  theme_minimal() +
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
+
+
+hulls2020 <- scores_2020 %>%
+  group_by(cluster) %>%
+  do(hull(.))
+
+ggplot() +
+  geom_polygon(data = hulls2020, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
+  geom_point(data = scores_2020, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
+  geom_text(data = scores_2020, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2020)), vjust = -0.5, hjust = 0.5, size = 3) +
+  labs(title = "Cluster Visualization 2020", x = "PC1", y = "PC2") +
+  theme_minimal() +
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
+
+
+hulls2022 <- scores_2022 %>%
+  group_by(cluster) %>%
+  do(hull(.))
+
+
+ggplot() +
+  geom_polygon(data = hulls2022, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
+  geom_point(data = scores_2022, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
+  geom_text(data = scores_2022, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2022)), vjust = -0.5, hjust = 0.5, size = 3) +
+  labs(title = "Cluster Visualization 2022", x = "PC1", y = "PC2") +
+  theme_minimal() +
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
 
 
 #####
