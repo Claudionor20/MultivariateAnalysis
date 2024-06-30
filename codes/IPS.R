@@ -319,10 +319,12 @@ ggplot() +
   geom_polygon(data = hulls, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
   geom_point(data = scores_2016, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
   geom_text(data = scores_2016, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2016)), vjust = -0.5, hjust = 0.5, size = 3) +
-  labs(title = "Cluster Visualization 2016", x = "PC1", y = "PC2") +
-  theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb","red", "pink"))
+  labs(title = "Cluster IPS 2016", x = "PC1", y = "PC2") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(-30,30,5))+
+  scale_y_continuous(breaks = seq(-20,20,5), limits = c(-10,20))+
+  scale_fill_brewer(palette  = "Dark2") + # Ajuste das cores dos clusters
+  scale_color_brewer(palette = "Dark2")
 
 hulls2018 <- scores_2018 %>%
   group_by(cluster) %>%
@@ -333,10 +335,12 @@ ggplot() +
   geom_polygon(data = hulls2018, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
   geom_point(data = scores_2018, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
   geom_text(data = scores_2018, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2018)), vjust = -0.5, hjust = 0.5, size = 3) +
-  labs(title = "Cluster Visualization 2018", x = "PC1", y = "PC2") +
-  theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink"))
+  labs(title = "Cluster IPS 2018", x = "PC1", y = "PC2") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(-30,30,5))+
+  scale_y_continuous(breaks = seq(-20,20,5), limits = c(-10,20))+
+  scale_fill_brewer(palette  = "Dark2") + # Ajuste das cores dos clusters
+  scale_color_brewer(palette = "Dark2")
 
 
 hulls2020 <- scores_2020 %>%
@@ -347,10 +351,12 @@ ggplot() +
   geom_polygon(data = hulls2020, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
   geom_point(data = scores_2020, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
   geom_text(data = scores_2020, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2020)), vjust = -0.5, hjust = 0.5, size = 3) +
-  labs(title = "Cluster Visualization 2020", x = "PC1", y = "PC2") +
-  theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink"))
+  labs(title = "Cluster IPS 2020", x = "PC1", y = "PC2") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(-30,30,5))+
+  scale_y_continuous(breaks = seq(-20,20,5), limits = c(-10,20))+
+  scale_fill_brewer(palette  = "Dark2") + # Ajuste das cores dos clusters
+  scale_color_brewer(palette = "Dark2")
 
 
 hulls2022 <- scores_2022 %>%
@@ -362,10 +368,12 @@ ggplot() +
   geom_polygon(data = hulls2022, aes(x = Dim.1, y = Dim.2, fill = cluster, group = cluster), alpha = 0.3) +
   geom_point(data = scores_2022, aes(x = Dim.1, y = Dim.2, color = cluster), size = 3) +
   geom_text(data = scores_2022, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2022)), vjust = -0.5, hjust = 0.5, size = 3) +
-  labs(title = "Cluster Visualization 2022", x = "PC1", y = "PC2") +
-  theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink"))
+  labs(title = "Cluster IPS 2022", x = "PC1", y = "PC2") +
+  theme_bw() +
+  scale_x_continuous(breaks = seq(-30,30,5))+
+  scale_y_continuous(breaks = seq(-20,20,5), limits = c(-10,20))+
+  scale_fill_brewer(palette  = "Dark2") + # Ajuste das cores dos clusters
+  scale_color_brewer(palette = "Dark2")
 
 
 #####
