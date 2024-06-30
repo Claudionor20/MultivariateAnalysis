@@ -112,7 +112,7 @@ ggplot(ips_long, aes(x = as.factor(ano), y = valor, group = interaction(ano, var
 
 # Mapa de calor IPS
 dados_geojson <- st_read("mapa.geojson")
-dados_ips_2020 <- ips[ips$ano == 2018, ]
+dados_ips_2020 <- ips[ips$ano == 2022, ]
 # Substituir Maré por Complexo da Maré
 dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Maré"] <- "Complexo da Maré"
 dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Iraja"] <- "Irajá"
@@ -140,7 +140,7 @@ ggplot() +
     name = "IPS Geral"
   ) +
   theme_minimal() +
-  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2016)") +
+  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2022)") +
   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
         legend.title = element_text(size = 12),
         legend.text = element_text(size = 10))
@@ -195,7 +195,6 @@ scores_2018 <- as.data.frame(as.matrix(IPS_2018) %*% as.matrix(loadings))
 scores_2020 <- as.data.frame(as.matrix(IPS_2020) %*% as.matrix(loadings))
 
 scores_2022 <- as.data.frame(as.matrix(IPS_2022) %*% as.matrix(loadings))
-
 
 
 pca_result_2018 <- PCA(IPS_2018, ncp = ncol(IPS_2018), graph = FALSE)
@@ -282,12 +281,11 @@ for (plot in plots) {
 
 #####Agrupando utilizando todas as variáveis #####
 
-
 ips_c = ips_anos[["ips_2016"]][c(-1,-2,-3)]
 ips_c = scale(ips_c)
 row.names(ips_c) = ips_anos$ips_2016$regiao_administrativa
 
-dist_ipsc = dist(ips_c)
+dist_ipsc = dist(scores_2016)
 
 cluster_ips = hclust(dist_ipsc, method = "single")
 par(mfrow = c(1,1))
@@ -299,7 +297,7 @@ plot(cluster_ips2, main = "complete")
 cluster_ips3 = hclust(dist_ipsc, method = "average")
 
 plot(cluster_ips3, main = "avg")
-clusters_ips <- cutree(cluster_ips2, k = 3)
+clusters_ips <- cutree(cluster_ips2, k = 4)
 
 # Adicionar os clusters aos scores
 scores_2016$cluster <- as.factor(clusters_ips)
@@ -323,8 +321,8 @@ ggplot() +
   geom_text(data = scores_2016, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2016)), vjust = -0.5, hjust = 0.5, size = 3) +
   labs(title = "Cluster Visualization 2016", x = "PC1", y = "PC2") +
   theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb","red", "pink"))
 
 hulls2018 <- scores_2018 %>%
   group_by(cluster) %>%
@@ -337,8 +335,8 @@ ggplot() +
   geom_text(data = scores_2018, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2018)), vjust = -0.5, hjust = 0.5, size = 3) +
   labs(title = "Cluster Visualization 2018", x = "PC1", y = "PC2") +
   theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink"))
 
 
 hulls2020 <- scores_2020 %>%
@@ -351,8 +349,8 @@ ggplot() +
   geom_text(data = scores_2020, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2020)), vjust = -0.5, hjust = 0.5, size = 3) +
   labs(title = "Cluster Visualization 2020", x = "PC1", y = "PC2") +
   theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink"))
 
 
 hulls2022 <- scores_2022 %>%
@@ -366,8 +364,8 @@ ggplot() +
   geom_text(data = scores_2022, aes(x = Dim.1, y = Dim.2, label = rownames(scores_2022)), vjust = -0.5, hjust = 0.5, size = 3) +
   labs(title = "Cluster Visualization 2022", x = "PC1", y = "PC2") +
   theme_minimal() +
-  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb")) + # Ajuste das cores dos clusters
-  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb"))
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink")) + # Ajuste das cores dos clusters
+  scale_color_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "red", "pink"))
 
 
 #####
