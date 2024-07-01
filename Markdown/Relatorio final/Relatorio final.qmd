@@ -844,6 +844,7 @@ rect.hclust(cluster_ips2, k = 4, border = 2:5) # Aqui, k define o número de clu
 ```
 
 ### Gráfico Média do IPS Geral por Cluster Hierárquico ao Decorrer dos Anos
+##### A partir do gráfico, é possível perceber que o cluster 1 possui uma média de IPS Geral mais alta, enquanto o cluster 4 possui a menor média.
 
 ```{r}
 clusters_ips <- cutree(cluster_ips2, k = 4)
