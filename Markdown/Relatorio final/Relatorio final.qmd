@@ -266,7 +266,7 @@ medidas_resumo <- function(data) {
     summarise(
       media = mean(value),
       dp = sd(value),
-      coef = (mean(value) / sd(value)) * 100,
+      coef = (sd(value) / mean(value)) * 100,
       mediana = median(value),
       IQQ = paste(quantile(value, 0.25), quantile(value, 0.75), sep = "-"),
       ASS = 3 * (mean(value) - median(value)) / sd(value)
@@ -365,6 +365,10 @@ MVN::mvn(data = N_W, mvnTest = "mardia", multivariatePlot = "qq") #Conjuntamente
 
 ```
 
+Diante dos resultados obtidos acima conclui-se que as variáveis dos grupos também seguem normal multivariada
+
+Outra suposição importante a ser verificada é a de igualdades das matrizes de variância e covariâncias dos grupos.
+
 ```{r}
 
 X<-as.matrix(Wolves[,c(-1,-2,-3)])
@@ -374,8 +378,23 @@ vegan::permutest(X) # Matriz de covariancias são homogeneas
 plot(X)
 
 
+```
+Com base em um nível de significância de 5% não se rejeita a hipótese nula de que as matrizes de covariâncias dos grupos são iguais.
+
+
+Validando a última suposição, precisamos verificar se há pelo menos uma média diferentes nos grupos.
+
+```{r}
 Manova <- aov(x1+x2+x3+x4+x5+x6+x7+x8+x9 ~ group, data = Wolves)
 summary(Manova) # As medias não são homogeneas
+```
+
+Com base em um nível de significância de 5% verificou-se há pelo menos uma média diferente entre os grupos.
+
+
+Após verificar as suposições, o modelo LDA é criado. Em seguida as probabilidades a posteriori das previsões do modelo são calculadas.
+
+```{r}
 
 #Análise discriminante
 Wolves_n <- Wolves[,c(1,4:12)]
@@ -383,12 +402,24 @@ spe.lda <- lda(group ~., data=Wolves_n)
 
 round(predict(spe.lda)$posterior,2)
 
+```
+
+Posteriormente, são calculadas as proporções corretas das previsões para cada grupo, obtendo a taxa de acertos por grupo
+
+
+```{r}
 ta <- table(Wolves[,1],predict(spe.lda)$class)
 
 diag(prop.table(ta,1))
+```
 
+Finalmente, é gerada uma matriz de confusão, que mostra como as classificações previstas se comparam com as classificações reais.
+
+```{r}
 caret::confusionMatrix(predict(spe.lda)$class, Wolves$group)
 ```
+
+Portanto, verifica-se que o modelo LDA errou apenas 1 grupo, com uma acurácia de 96%
 
 ## K-means
 
@@ -799,9 +830,10 @@ ggplot(data_long, aes(x = value)) +
 ```
 
 
-### Mapa de Calor da Variável IPS
+### Mapa de Calor da Variável IPS,
 
-```{r}
+
+```{r warning=FALSE, message=FALSE} 
 
 # Mapa de calor IPS
 dados_geojson <- st_read("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/mapa.geojson")
@@ -843,7 +875,7 @@ ggplot() +
 ## Análise PCA
 
 ### Componentes Principais e Municípios
-##### Com base no gráfico de 2016 ,é possível perceber que o IPS é bastante influenciado pela primeira componente principal. Essa componente trata majoritariamente do Acesso a educação e Informação. Diante disso, conclui-se que regiões como Lago, Botafogo e Copacabana possuem um alto IPS devido, em grande parte, aos altos indices de acesso a educação e informação. Em contraste com isso, as regiões como Jacarezinho, Rocinha e Complexo do Alemão possuem um IPS mais baixo, em maioria, devido a falta desses recursos.
+Com base no gráfico de 2016 ,é possível perceber que o IPS é bastante influenciado pela primeira componente principal. Essa componente trata majoritariamente do Acesso a educação e Informação. Diante disso, conclui-se que regiões como Lago, Botafogo e Copacabana possuem um alto IPS devido, em grande parte, aos altos indices de acesso a educação e informação. Em contraste com isso, as regiões como Jacarezinho, Rocinha e Complexo do Alemão possuem um IPS mais baixo, em maioria, devido a falta desses recursos.
 
 ```{r}
 # Remover colunas categóricas e escalar os dados
@@ -871,7 +903,7 @@ fviz_pca_biplot(pca_result,addlabels = TRUE)
 ```
 
 ### Agrupamento Hierárquico das Regiões Administrativas
-##### Utilizando-se do método hierárquico completo, é possível perceber que as regiões administrativas foram agrupadas em 4 clusters, que pelos scores nos componentes principais, podemos chamar de regiões de favelas não-urbanizadas, regiões de classe média-baixa, regiões de classe média-alta e regiões de elite.
+Utilizando-se do método hierárquico completo, é possível perceber que as regiões administrativas foram agrupadas em 4 clusters, que pelos scores nos componentes principais, podemos chamar de regiões de favelas não-urbanizadas, regiões de classe média-baixa, regiões de classe média-alta e regiões de elite.
 
 ```{r}
 #####Agrupando utilizando todas as variáveis #####
@@ -887,11 +919,11 @@ plot(cluster_ips2, main = "Modelo Hierárquico completo", xlab = "", ylab = "",s
 rect.hclust(cluster_ips2, k = 4, border = 2:5) # Aqui, k define o número de clusters, ajuste conforme necessário
 ```
 
-##### Nas favelas não-urbanizadas podemos ver o Complexo do Alemão, a Rocinha e Jacarezinho; nas regiões de classe média-baixa, lugares como a Penha, Jacarepaguá, Rio de Janeiro, Santa Cruz, Campo Grande e até Cidade de Deus. Em classe média-alta, temos o Centro, Irajá, Barra da Tijuca, e afins. E por fim, no agrupamento de elite, a Lagoa, Botafogo e Copacabana.
+Nas favelas não-urbanizadas podemos ver o Complexo do Alemão, a Rocinha e Jacarezinho; nas regiões de classe média-baixa, lugares como a Penha, Jacarepaguá, Rio de Janeiro, Santa Cruz, Campo Grande e até Cidade de Deus. Em classe média-alta, temos o Centro, Irajá, Barra da Tijuca, e afins. E por fim, no agrupamento de elite, a Lagoa, Botafogo e Copacabana.
 
 
 ### Gráfico Média do IPS Geral por Cluster Hierárquico ao Decorrer dos Anos
-##### A partir do gráfico, é possível perceber que o cluster 1 possui uma média de IPS Geral mais alta, enquanto o cluster 4 possui a menor média. Vemos também que os grupos de menor média de IPS Geral foram também os que mais melhoraram no índice nos últimos anos.
+A partir do gráfico, é possível perceber que o cluster 1 possui uma média de IPS Geral mais alta, enquanto o cluster 4 possui a menor média. Vemos também que os grupos de menor média de IPS Geral foram também os que mais melhoraram no índice nos últimos anos.
 
 ```{r warning=FALSE, message=FALSE}
 clusters_ips <- cutree(cluster_ips2, k = 4)
@@ -910,7 +942,7 @@ ips_cl |>
   labs(title = "Média do IPS Geral por Cluster", 
        subtitle = "Região administrativa")
 ```
-###### Nas análises a seguir, as regiões administrativas Rocinha, Maré, Lagoa e Méier foram escolhidas para uma avaliação detalhada do comportamento de seus indicadores ao longo dos anos.
+Nas análises a seguir, as regiões administrativas Rocinha, Maré, Lagoa e Méier foram escolhidas para uma avaliação detalhada do comportamento de seus indicadores ao longo dos anos.
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Positivamente na Rocinha, Maré, Lagoa e Méier
 
@@ -959,7 +991,7 @@ gridExtra::grid.arrange(a1,a2,a3,a4)
 ```
 
 
-###### Veja que a proporção de ocorrência de gravidez na adolescência caiu muito, em resposta principalmente à melhora no acesso à informação.
+Veja que a proporção de ocorrência de gravidez na adolescência caiu muito, em resposta principalmente à melhora no acesso à informação.
 
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Negativamente na Rocinha, Maré, Lagoa e Méier
@@ -1008,4 +1040,4 @@ gridExtra::grid.arrange(g1,g2,g3,g4)
 ```
 
 
-###### O impacto é negativo porque o acesso ao ensino superior e a meios de comunicação/informação (internet e celular) é ainda muito limitado quando comparado com outras regiões do Rio de Janeiro.
+O impacto é negativo porque o acesso ao ensino superior e a meios de comunicação/informação (internet e celular) é ainda muito limitado quando comparado com outras regiões do Rio de Janeiro.
