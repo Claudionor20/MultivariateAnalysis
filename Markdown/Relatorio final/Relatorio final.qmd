@@ -914,6 +914,10 @@ a4 = ips_cl |>
 gridExtra::grid.arrange(a1,a2,a3,a4)
 ```
 
+
+###### Veja que a proporção de ocorrência de gravidez na adolescência caiu muito, em resposta principalmente à melhora no acesso à informação.
+
+
 ### Comportamento dos Indicadores que mais Impactam o PC1 Negativamente na Rocinha, Maré, Lagoa e Méier
 
 ```{r warning=FALSE, message=FALSE}
@@ -958,3 +962,6 @@ g4 = ips_cl |>
 
 gridExtra::grid.arrange(g1,g2,g3,g4)
 ```
+
+
+###### O impacto é negativo porque o acesso ao ensino superior e a meios de comunicação/informação (internet e celular) é ainda muito limitado quando comparado com outras regiões do Rio de Janeiro.
