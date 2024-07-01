@@ -20,19 +20,27 @@ editor_options:
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 ```
 
-Trabalho final da disciplina de Análise Multivariada, referente ao primeiro período de 2024. Esse trabalho é uma colaboração de Caio Falcão, Claudionor Ferreira, Guilherme Ceacero e Paulo Martinez. 
+Trabalho final da disciplina de Análise Multivariada, referente ao
+primeiro período de 2024. Esse trabalho é uma colaboração de Caio
+Falcão, Claudionor Ferreira, Guilherme Ceacero e Paulo Martinez.
 
-# Questão 1 
+# Questão 1
 
-Nesta seção, demonstramos a direção discriminante de Fisher para discriminação linear entre duas populações. Consideramos duas populações $\pi_1$ e $\pi_2$ baseadas na amostra rotulada $( {(xj , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que $n_1 + n_2 = n$ e $n_i$ é o número de elementos da população $\pi_i$.
+Nesta seção, demonstramos a direção discriminante de Fisher para
+discriminação linear entre duas populações. Consideramos duas populações
+$\pi_1$ e $\pi_2$ baseadas na amostra rotulada
+$( {(xj , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que
+$n_1 + n_2 = n$ e $n_i$ é o número de elementos da população $\pi_i$.
 
 ## Considerações
 
 ### Definições
 
 -   $\bar{x}_i$ representa o vetor de médias das observações em $\pi_i$.
--   $S_i$ representa a matriz de covariâncias amostral das observações em $\pi\_i$.
--   $S_p$ = $\frac{(n_1-1)S_1 + (n_2-1)S_2}{n-2}$ é a matriz de covariâncias combinada.
+-   $S_i$ representa a matriz de covariâncias amostral das observações
+    em $\pi\_i$.
+-   $S_p$ = $\frac{(n_1-1)S_1 + (n_2-1)S_2}{n-2}$ é a matriz de
+    covariâncias combinada.
 
 ### Projeção
 
@@ -44,7 +52,8 @@ $$
 \end{align}
 $$
 
-E consequentemente, as médias das populações $\pi_1$ e $\pi_2$ projetadas serão
+E consequentemente, as médias das populações $\pi_1$ e $\pi_2$
+projetadas serão
 
 $\hat m_1 = \alpha^T \space \bar{x}_1$
 
@@ -54,7 +63,8 @@ E a diferença dessas projeções sendo
 
 $\hat m_1 - \hat m_2 = \alpha^T(\bar{x}_1 - \bar{x}_2)$.
 
-A variabilidade resultante na projeção é a variância da projeção $z$, que é dada por
+A variabilidade resultante na projeção é a variância da projeção $z$,
+que é dada por
 
 $$
 \begin{align}
@@ -64,11 +74,14 @@ $$
 \end{align}
 $$
 
-E então, $\phi = \left(\frac{\hat m_1 - \hat m_2}{S_z}\right)^2 = \left(\frac{\alpha^T (\bar{x}_1 - \bar{x}_2)}{\sqrt{\alpha^T S_p \space \alpha}}\right)^2$.
+E então,
+$\phi = \left(\frac{\hat m_1 - \hat m_2}{S_z}\right)^2 = \left(\frac{\alpha^T (\bar{x}_1 - \bar{x}_2)}{\sqrt{\alpha^T S_p \space \alpha}}\right)^2$.
 
 ### Maximização da Distância
 
-Queremos encontrar a direção $\alpha$ que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção. Ou seja, queremos maximizar:
+Queremos encontrar a direção $\alpha$ que maximiza a distância entre as
+médias projetadas das populações com relação à variabilidade resultante
+na projeção. Ou seja, queremos maximizar:
 
 $$
 \begin{equation}
@@ -78,7 +91,10 @@ $$
 
 ## Demonstração
 
-Vamos aplicar a restrição $\alpha^T S_p \space \alpha$ constante e igual à $1$, pois do contrário poderíamos ter $\phi$ tão grande quanto desejável. Nesse caso, então, vamos usar o método de Lagrange para otimização com restrição.
+Vamos aplicar a restrição $\alpha^T S_p \space \alpha$ constante e igual
+à $1$, pois do contrário poderíamos ter $\phi$ tão grande quanto
+desejável. Nesse caso, então, vamos usar o método de Lagrange para
+otimização com restrição.
 
 Começamos com a expressão a ser maximizada:
 
@@ -86,7 +102,8 @@ $$
 \phi = \frac{(\alpha^T (\bar{x}_1 - \bar{x}_2))^2}{\alpha^T S_p \space \alpha}
 $$
 
-Para maximizar $\phi$, usamos multiplicadores de Lagrange. Definimos a função Lagrangiana:
+Para maximizar $\phi$, usamos multiplicadores de Lagrange. Definimos a
+função Lagrangiana:
 
 $$ 
 \mathcal{L}(\alpha, \lambda) = (\alpha^T (\bar{x}_1 - \bar{x}_2))^2 - \lambda (\alpha^T S_p \space \alpha - 1)
@@ -120,7 +137,8 @@ $$
 (\bar{x}_1 - \bar{x}_2) = \lambda S_p \space \alpha
 $$
 
-Para encontrar $\lambda$, substituímos $\alpha$ na segunda equação de restrição:
+Para encontrar $\lambda$, substituímos $\alpha$ na segunda equação de
+restrição:
 
 $$
 \begin{equation}
@@ -139,7 +157,8 @@ $$
 \end{align}
 $$
 
-E agora, substituindo $\lambda$ encontrado em (4) na equação de $\alpha$ (3), temos:
+E agora, substituindo $\lambda$ encontrado em (4) na equação de $\alpha$
+(3), temos:
 
 $$
 \begin{equation}
@@ -147,14 +166,18 @@ $$
 \end{equation}
 $$
 
-Note que o denominador dessa equação é um escalar $1x1$, e portanto, a direção de $\alpha$ que maximiza a diferença das duas populações é dada pelo vetor $\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)$ pelo método de otimização restrita de Lagrange.
+Note que o denominador dessa equação é um escalar $1x1$, e portanto, a
+direção de $\alpha$ que maximiza a diferença das duas populações é dada
+pelo vetor $\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)$ pelo método de
+otimização restrita de Lagrange.
 
 ## Conclusão
 
-Dessa forma, mostramos que a direção $\alpha$ que maximiza a distância entre as médias projetadas das populações com relação à variabilidade resultante na projeção é a direção discriminante de Fisher.
+Dessa forma, mostramos que a direção $\alpha$ que maximiza a distância
+entre as médias projetadas das populações com relação à variabilidade
+resultante na projeção é a direção discriminante de Fisher.
 
-
-# Questão 2 
+# Questão 2
 
 ```{r bibliotecas, warning=FALSE}
 library(candisc) #base de dados wolves
@@ -171,7 +194,9 @@ library(labelled)
 library(tidyr)
 ```
 
-Após realizar a importação da base de dados, verificamos se a base possui valores faltantes e se as variáveis estão corretamente formatadas: 
+Após realizar a importação da base de dados, verificamos se a base
+possui valores faltantes e se as variáveis estão corretamente
+formatadas:
 
 ```{r base1, warning=FALSE}
 data(Wolves) #base da biblioteca candisc
@@ -180,11 +205,13 @@ naniar::miss_var_summary(Wolves)
 str(Wolves)
 ```
 
-Com a base devidamente importada e sem a presença de valores faltantes, prosseguimos com a análise descritiva:
+Com a base devidamente importada e sem a presença de valores faltantes,
+prosseguimos com a análise descritiva:
 
-## Análise descritiva: 
+## Análise descritiva:
 
-Primeiro, verificamos as variáveis qualitativas da base de dados: 
+Primeiro, verificamos as variáveis qualitativas da base de dados:
+
 ```{r grupos}
 table(Wolves$sex)
 table(Wolves$location)
@@ -194,9 +221,12 @@ Wolves |> ggplot(aes(x = group))+
   labs(y = "Frequência", x = "Grupo")+
   theme_minimal()
 ```
-Observa-se que o grupo mais presente na amostra são de lobos machos da localização "ar".
 
-Para as variáveis quantitativas, considere as seguintes medidas de resumo:
+Observa-se que o grupo mais presente na amostra são de lobos machos da
+localização "ar".
+
+Para as variáveis quantitativas, considere as seguintes medidas de
+resumo:
 
 ```{r medidas}
 
@@ -264,7 +294,8 @@ medidas_res |>
 ) 
 ```
 
-Além das medidas resumos, pode ser de interesse realizar uma análise gráfica nos dados. Para isso, veja o histograma das variáveis: 
+Além das medidas resumos, pode ser de interesse realizar uma análise
+gráfica nos dados. Para isso, veja o histograma das variáveis:
 
 ```{r histograma}
 par(mfrow = c(3,3))
@@ -279,7 +310,9 @@ for(i in 1:ncol(Wolves)){
   }
 }
 ```
-Surge também, a necessidade de verificar a correlação entre as variáveis. 
+
+Surge também, a necessidade de verificar a correlação entre as
+variáveis.
 
 ```{r correlacao}
 pairs(Wolves[,4:12], 
@@ -288,7 +321,8 @@ pairs(Wolves[,4:12],
 corrplot::corrplot(cor(Wolves[,4:12]), method = "square" , order = "hclust", tl.col='black', tl.cex=.75) 
 
 ```
-Por fim, considere o boxplot das variáveis separadas por grupo. 
+
+Por fim, considere o boxplot das variáveis separadas por grupo.
 
 ```{r boxplot}
 plots <- list()
@@ -312,7 +346,8 @@ do.call("grid.arrange", c(plots, ncol = 3))
 
 ## Análise de discriminante
 
-O primeiro passo para realizar a análise de discriminante é verificar a normalidade dos dados.
+O primeiro passo para realizar a análise de discriminante é verificar a
+normalidade dos dados.
 
 ```{r teste de normalidade}
 N_W <- Wolves[,4:length(Wolves)]
@@ -347,7 +382,6 @@ diag(prop.table(ta,1))
 caret::confusionMatrix(predict(spe.lda)$class, Wolves$group)
 ```
 
-
 ## K-means
 
 ```{r ncluster}
@@ -360,6 +394,7 @@ X = as.matrix(X)
 
 fviz_nbclust(X, kmeans, method = "wss")
 ```
+
 Pelo gráfico parece razoável escolher 4 clusters
 
 ```{r clustering}
@@ -380,7 +415,8 @@ points(km_res$centers, col = 1:K, pch = 8, cex = 2)
 
 ## Agrupamento hierárquico
 
-Agora, o objetivo será realizar um agrumento hierarquico nos dados. Para isso, primeiro serão realizadas algumas mudanças na base de dados.
+Agora, o objetivo será realizar um agrumento hierarquico nos dados. Para
+isso, primeiro serão realizadas algumas mudanças na base de dados.
 
 ```{r}
 ##como numeric
@@ -393,8 +429,10 @@ Xh = Xh |>
 
 Xh = scale(Xh)
 ```
-Veja que os dados foram padronizados, ... 
-Para realizar o agrupamento, primeiro é calculada a matriz de distâncias, depois prossegue-se com o algoritmo de ligação. 
+
+Veja que os dados foram padronizados, ... Para realizar o agrupamento,
+primeiro é calculada a matriz de distâncias, depois prossegue-se com o
+algoritmo de ligação.
 
 ```{r}
 dist_matrix <- dist(Xh)
@@ -404,11 +442,15 @@ hc_complete <- hclust(dist_matrix, method = "complete")
 plot(hc_complete, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
 ```
 
-Com os resultados obtidos, é então possível realizar o agrupamento. Para isso, considere como critério a medida de dissimilaridade Sendo assim, ficaremos com o total de 3 grupos distintos. 
+Com os resultados obtidos, é então possível realizar o agrupamento. Para
+isso, considere como critério a medida de dissimilaridade Sendo assim,
+ficaremos com o total de 3 grupos distintos.
 
 ## Comparação do k-means e do agrupamento hierárquico
 
-Para fazer a comparação, primeiro iremos atribuir as observações aos seus grupos encontrados pelos algoritmos. 
+Para fazer a comparação, primeiro iremos atribuir as observações aos
+seus grupos encontrados pelos algoritmos.
+
 ```{r}
 
 # Plotar o gráfico de agrupamento usando fviz_cluster
@@ -422,8 +464,8 @@ fviz_cluster(list(data = Xh, cluster = cutree(hc_complete, k = 3)),
 
 ```
 
+# Questão 3
 
-# Questão 3 
 ```{r leitura3}
 dados = read.table("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/alimentos.txt", header = T)
 row.names(dados)=dados$pais
@@ -432,7 +474,9 @@ head(dados)
 
 ## Hierarquia parcial
 
-Em um primeiro momento, será de interesse construir um modelo hierárquico utilizando apenas as variáveis leite e fruta/legumes. 
+Em um primeiro momento, será de interesse construir um modelo
+hierárquico utilizando apenas as variáveis leite e fruta/legumes.
+
 ```{r hir_leiteFL}
 dados_LF = dplyr::select(dados, lech, fleg)
 dados_LF = scale(dados_LF)
@@ -445,7 +489,8 @@ plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "",
 
 ## Hierarquia completa
 
-É possível prosseguir com a análise considerando todas as variáveis. Considere, então, o método de ligação completo.
+É possível prosseguir com a análise considerando todas as variáveis.
+Considere, então, o método de ligação completo.
 
 ```{r hier_ALL}
 dados_All = dplyr::select(dados, -pais)
@@ -459,7 +504,8 @@ plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab
 
 ## Hierarquica completa com average
 
-Agora, o objetivo será realizar o agrupamento com o método de ligação média, isto é, metodo $average$.
+Agora, o objetivo será realizar o agrupamento com o método de ligação
+média, isto é, metodo $average$.
 
 ```{r hier_avg}
 Xa = dplyr::select(dados, -pais)
@@ -473,22 +519,30 @@ plot(hc_avg, main = "Average ligação com todas as variáveis", sub = "", xlab 
 
 ## Cortando as árvores
 
-Vemos métodos de ligações diferentes utilizando variáveis diferentes, a fim de comparação, considere os agrupamentos utilizando a ligação completa com números de cluster 2 e 3.  
+Vemos métodos de ligações diferentes utilizando variáveis diferentes, a
+fim de comparação, considere os agrupamentos utilizando a ligação
+completa com números de cluster 2 e 3.
 
-Primeiro, é realizado o corte no contexto das variáveis consumo de leite e frutas/legumes.
+Primeiro, é realizado o corte no contexto das variáveis consumo de leite
+e frutas/legumes.
+
 ```{r k23 leite}
 plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
 abline(h = 2.5, col = "red", lty = 2) 
 abline(h = 2.1, col = "blue", lty = 2) 
 legend("topright", legend = c("2 grupos", "3 grupos"), col = c("red", "blue"), lty = c(2, 3), bty = "n")
 ```
+
 Dessa forma, para 2 $clusters$ temos:
 
 ```{r}
 plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
 rect.hclust(hc_FL, k = 2, border = 2:4)
 ```
-Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México, o segundo $cluster$ com Espanha, Reino Unido, Noruega, Países Baixos, França e Estados Unidos.  
+
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México,
+o segundo $cluster$ com Espanha, Reino Unido, Noruega, Países Baixos,
+França e Estados Unidos.
 
 Já para 3 $clusters$ temos:
 
@@ -496,8 +550,10 @@ Já para 3 $clusters$ temos:
 plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
 rect.hclust(hc_FL, k = 3, border = 2:5)
 ```
-Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México, o segundo $cluster$ com Espanha e o terceiro com Reino Unido, Noruega, Países Baixos, França e Estados Unidos.
 
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México,
+o segundo $cluster$ com Espanha e o terceiro com Reino Unido, Noruega,
+Países Baixos, França e Estados Unidos.
 
 ```{r cutTree complete}
 #k=2
@@ -522,7 +578,7 @@ flextable(dados) %>%
   colformat_double(digits = 2)
 ```
 
-Ainda, fazendo o corte pra todas as variáveis: 
+Ainda, fazendo o corte pra todas as variáveis:
 
 ```{r k34 tudo}
 plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
@@ -530,13 +586,16 @@ abline(h = 7.65, col = "red", lty = 2)
 abline(h = 5, col = "blue", lty = 2) 
 legend("topright", legend = c("2 grupos", "3 grupos"), col = c("red", "blue"), lty = c(2, 3), bty = "n")
 ```
+
 Dessa forma, para 2 $clusters$ temos:
 
 ```{r}
 plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
 rect.hclust(hc_All, k = 2, border = 2:4)
 ```
-Sendo assim, teriamos o primeiro $cluster$ com Hungria, em quanto o segundo é formado pelos demais países.
+
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, em quanto o
+segundo é formado pelos demais países.
 
 Já para 3 $clusters$ temos:
 
@@ -544,9 +603,12 @@ Já para 3 $clusters$ temos:
 plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
 rect.hclust(hc_FL, k = 3, border = 2:5)
 ```
-Sendo assim, teriamos o primeiro $cluster$ com Hungria, já o segundo $cluster$ com Espanha, Países Baixos, França e Estados Unidos, e o terceiro com Reino Unido, Noruega, Japão e México.
 
-Ainda, 
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, já o segundo
+$cluster$ com Espanha, Países Baixos, França e Estados Unidos, e o
+terceiro com Reino Unido, Noruega, Japão e México.
+
+Ainda,
 
 ```{r}
 #k = 2
@@ -573,9 +635,7 @@ flextable(dados2) %>%
   colformat_double(digits = 2)
 ```
 
-
-
-## Visualização gráfico 
+## Visualização gráfico
 
 ```{r}
 
@@ -615,9 +675,10 @@ fviz_cluster(list(data = dados_All, cluster = clustersAll_3),
 
 ```
 
-# Questão 4 
+# Questão 4
 
 ### Bases
+
 Considere as bases a serem utilizadas na análise
 
 ```{r bibliotecas4, warning=FALSE}
@@ -711,6 +772,7 @@ ips_geral|>
     y = "IPS"
   )
 ```
+
 ### Histogramas
 
 ```{r fig.width=12, fig.height=8}
@@ -729,14 +791,17 @@ ggplot(data_long, aes(x = value)) +
 ## Análise PCA
 
 ### Componentes Principais e Municípios
+##### Com base no gráfico de 2016 ,é possível perceber que o IPS é bastante influenciado pela primeira componente principal. Essa componente trata majoritariamente do Acesso a educação e Informação. Diante disso, conclui-se que regiões como Lago, Botafogo e Copacabana possuem um alto IPS devido, em grande parte, aos altos indices de acesso a educação e informação. Em contraste com isso, as regiões como Jacarezinho, Rocinha e Complexo do Alemão possuem um IPS mais baixo, em maioria, devido a falta desses recursos.
 
 ```{r}
 # Remover colunas categóricas e escalar os dados
 IPS_d <- scale(ips_anos$ips_2016[,-c(1,2,3)])
+IPS_pca <- scale(ips_anos$ips_2016[,-c(1,2)])
 rownames(IPS_d) <- ips_anos$ips_2016$regiao_administrativa
+rownames(IPS_pca) <- ips_anos$ips_2016$regiao_administrativa
 
 # Executar a PCA
-pca_result <- PCA(IPS_d, ncp = ncol(IPS_d), graph = FALSE)
+pca_result <- PCA(IPS_pca, ncp = ncol(IPS_d), quanti.sup = c(1), graph = FALSE)
 var_out <- get_pca_var(pca_result)
 loadings <- var_out$coord
 corelacao_pca <- var_out$cor
@@ -753,7 +818,8 @@ rownames(ips_anos$ips_2022) <- ips_anos$ips_2016$regiao_administrativa
 fviz_pca_biplot(pca_result,addlabels = TRUE)
 ```
 
-### Agrupamento Hierárquico
+### Agrupamento Hierárquico das Regiões Administrativas
+
 
 ```{r}
 #####Agrupando utilizando todas as variáveis #####
@@ -769,7 +835,7 @@ plot(cluster_ips2, main = "Modelo Hierárquico completo", xlab = "", ylab = "",s
 rect.hclust(cluster_ips2, k = 4, border = 2:5) # Aqui, k define o número de clusters, ajuste conforme necessário
 ```
 
-### Gráfico Média do IPS Geral por Cluster ao Decorrer dos Anos
+### Gráfico Média do IPS Geral por Cluster Hierárquico ao Decorrer dos Anos
 
 ```{r}
 clusters_ips <- cutree(cluster_ips2, k = 4)
@@ -788,10 +854,9 @@ ips_cl |>
   labs(title = "Média do IPS Geral por Cluster", 
        subtitle = "Região administrativa")
 ```
-
+###### Nas análises a seguir, as regiões administrativas Rocinha, Maré, Lagoa e Méier foram escolhidas para uma avaliação detalhada do ###### comportamento de seus indicadores ao longo dos anos.
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Positivamente na Rocinha, Maré, Lagoa e Méier
-
 
 ```{r}
 
@@ -839,9 +904,8 @@ gridExtra::grid.arrange(a1,a2,a3,a4)
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Negativamente na Rocinha, Maré, Lagoa e Méier
 
-
 ```{r}
-ips_clv = ips_cl |>  select(regiao_administrativa, ano, all_of(varia_pca), ips_geral, cluster)
+ips_clv = ips_cl |>  dplyr::select(regiao_administrativa, ano, all_of(varia_pca), ips_geral, cluster)
 
 
 g1 = ips_clv |> 
@@ -882,18 +946,3 @@ g4 = ips_cl |>
 
 gridExtra::grid.arrange(g1,g2,g3,g4)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

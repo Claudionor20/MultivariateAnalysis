@@ -20,10 +20,12 @@ ips_anos = list(ips_2016 = dplyr::filter(ips, ano == 2016),
 
 # Remover colunas categóricas e escalar os dados
 IPS_d <- scale(ips_anos$ips_2016[,-c(1,2,3)])
+IPS_pca <- scale(ips_anos$ips_2016[,-c(1,2)])
 rownames(IPS_d) <- ips_anos$ips_2016$regiao_administrativa
+rownames(IPS_pca) <- ips_anos$ips_2016$regiao_administrativa
 
 # Executar a PCA
-pca_result <- PCA(IPS_d, ncp = ncol(IPS_d), graph = FALSE)
+pca_result <- PCA(IPS_pca, ncp = ncol(IPS_d),quanti.sup = c(1), graph = FALSE)
 var_out <- get_pca_var(pca_result)
 loadings <- var_out$coord
 corelacao_pca <- var_out$cor
