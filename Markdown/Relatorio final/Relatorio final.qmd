@@ -26,15 +26,15 @@ Falcão, Claudionor Ferreira, Guilherme Ceacero e Paulo Martinez.
 
 # Questão 1
 
-<<<<<<< HEAD
+
 Nesta seção, demonstramos a direção discriminante de Fisher para
 discriminação linear entre duas populações. Consideramos duas populações
 $\pi_1$ e $\pi_2$ baseadas na amostra rotulada
-$( {(xj , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que
+$( {(x_j , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que
 $n_1 + n_2 = n$ e $n_i$ é o número de elementos da população $\pi_i$.
 =======
 Nesta seção, demonstramos a direção discriminante de Fisher para discriminação linear entre duas populações. Consideramos duas populações $\pi_1$ e $\pi_2$ baseadas na amostra rotulada $( {(x_j , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que $n_1 + n_2 = n$ e $n_i$ é o número de elementos da população $\pi_i$.
->>>>>>> 9fcdf72993727f9e2351175e6f4f50192b609315
+
 
 ## Considerações
 
@@ -171,7 +171,7 @@ $$
 $$
 
 <<<<<<< HEAD
-Note que o denominador dessa equação é um escalar $1x1$, e portanto, a
+Note que o denominador dessa equação é um escalar $1\times1$, e portanto, a
 direção de $\alpha$ que maximiza a diferença das duas populações é dada
 pelo vetor $\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)$ pelo método de
 otimização restrita de Lagrange.
@@ -700,8 +700,6 @@ library(factoextra)
 library(cluster)
 library(FactoMineR)
 library(CGPfunctions)
-library(RColorBrewer)
-library(sf)
 
 ```
 
@@ -798,43 +796,6 @@ ggplot(data_long, aes(x = value)) +
        y = "Frequência")
 ```
 
-
-### Mapa de Calor da variável IPS para o ano de 2022 por região administrativa
-
-```{r}
-dados_geojson <- st_read("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/mapa.geojson")
-dados_ips_2022 <- ips[ips$ano == 2022, ]
-
-# Substituir Maré por Complexo da Maré
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Maré"] <- "Complexo da Maré"
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Iraja"] <- "Irajá"
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Portuaria"] <- "Portuária"
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "São Cristovão"] <- "São Cristóvão"
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Barra Da Tijuca"] <- "Barra da Tijuca"
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Cidade De Deus"] <- "Cidade de Deus"
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Complexo Do Alemão"] <- "Complexo do Alemão"
-dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Ilha Do Governador"] <- "Ilha do Governador"
-
-regioes_ips_2020 <- merge(dados_geojson, dados_ips_2022, by.x = "nomera", by.y = "regiao_administrativa")
-
-ggplot() +
-  geom_sf(data = regioes_ips_2020, aes(fill = ips_geral)) +
-  geom_sf_text(data = regioes_ips_2020, aes(label = nomera), 
-               size = 3.5, color = "black", fontface = "bold", 
-               check_overlap = TRUE) +
-  scale_fill_gradientn(
-    colors = brewer.pal(9, "BuPu"),
-    values = scales::rescale(c(min(regioes_ips_2020$ips_geral), max(regioes_ips_2020$ips_geral))),
-    name = "IPS Geral"
-  ) +
-  theme_minimal() +
-  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2022)") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
-        legend.title = element_text(size = 12),
-        legend.text = element_text(size = 10))
-
-```
-
 ## Análise PCA
 
 ### Componentes Principais e Municípios
@@ -866,7 +827,7 @@ fviz_pca_biplot(pca_result,addlabels = TRUE)
 ```
 
 ### Agrupamento Hierárquico das Regiões Administrativas
-##### Utilizando-se do método hierárquico completo, é possível perceber que as regiões administrativas foram agrupadas em 4 clusters. 
+##### Utilizando-se do método hierárquico completo, é possível perceber que as regiões administrativas foram agrupadas em 4 clusters, que pelos scores nos componentes principais, podemos chamar de regiões de favelas não-urbanizadas, regiões de classe média-baixa, regiões de classe média-alta e regiões de elite.
 
 ```{r}
 #####Agrupando utilizando todas as variáveis #####
@@ -882,10 +843,13 @@ plot(cluster_ips2, main = "Modelo Hierárquico completo", xlab = "", ylab = "",s
 rect.hclust(cluster_ips2, k = 4, border = 2:5) # Aqui, k define o número de clusters, ajuste conforme necessário
 ```
 
-### Gráfico Média do IPS Geral por Cluster Hierárquico ao Decorrer dos Anos
-##### A partir do gráfico, é possível perceber que o cluster 1 possui uma média de IPS Geral mais alta, enquanto o cluster 4 possui a menor média.
+##### Nas favelas não-urbanizadas podemos ver o Complexo do Alemão, a Rocinha e Jacarezinho; nas regiões de classe média-baixa, lugares como a Penha, Jacarepaguá, Rio de Janeiro, Santa Cruz, Campo Grande e até Cidade de Deus. Em classe média-alta, temos o Centro, Irajá, Barra da Tijuca, e afins. E por fim, no agrupamento de elite, a Lagoa, Botafogo e Copacabana.
 
-```{r}
+
+### Gráfico Média do IPS Geral por Cluster Hierárquico ao Decorrer dos Anos
+##### A partir do gráfico, é possível perceber que o cluster 1 possui uma média de IPS Geral mais alta, enquanto o cluster 4 possui a menor média. Vemos também que os grupos de menor média de IPS Geral foram também os que mais melhoraram no índice nos últimos anos.
+
+```{r warning=FALSE, message=FALSE}
 clusters_ips <- cutree(cluster_ips2, k = 4)
 
 
@@ -902,11 +866,11 @@ ips_cl |>
   labs(title = "Média do IPS Geral por Cluster", 
        subtitle = "Região administrativa")
 ```
-###### Nas análises a seguir, as regiões administrativas Rocinha, Maré, Lagoa e Méier foram escolhidas para uma avaliação detalhada do ###### comportamento de seus indicadores ao longo dos anos.
+###### Nas análises a seguir, as regiões administrativas Rocinha, Maré, Lagoa e Méier foram escolhidas para uma avaliação detalhada do comportamento de seus indicadores ao longo dos anos.
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Positivamente na Rocinha, Maré, Lagoa e Méier
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 
 ips_clv = ips_cl |>  dplyr::select(regiao_administrativa, ano, all_of(varia_pca), ips_geral, cluster)
 
@@ -956,7 +920,7 @@ gridExtra::grid.arrange(a1,a2,a3,a4)
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Negativamente na Rocinha, Maré, Lagoa e Méier
 
-```{r}
+```{r warning=FALSE, message=FALSE}
 ips_clv = ips_cl |>  dplyr::select(regiao_administrativa, ano, all_of(varia_pca), ips_geral, cluster)
 
 
