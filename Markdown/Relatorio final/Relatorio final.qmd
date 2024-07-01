@@ -700,6 +700,8 @@ library(factoextra)
 library(cluster)
 library(FactoMineR)
 library(CGPfunctions)
+library(RColorBrewer)
+library(sf)
 
 ```
 
@@ -794,6 +796,43 @@ ggplot(data_long, aes(x = value)) +
   labs(title = "Histogramas Dos Indicadores do IPS",
        x = "Valor",
        y = "Frequência")
+```
+
+
+### Mapa de Calor da variável IPS para o ano de 2022 por região administrativa
+
+```{r}
+dados_geojson <- st_read("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/mapa.geojson")
+dados_ips_2022 <- ips[ips$ano == 2022, ]
+
+# Substituir Maré por Complexo da Maré
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Maré"] <- "Complexo da Maré"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Iraja"] <- "Irajá"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Portuaria"] <- "Portuária"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "São Cristovão"] <- "São Cristóvão"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Barra Da Tijuca"] <- "Barra da Tijuca"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Cidade De Deus"] <- "Cidade de Deus"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Complexo Do Alemão"] <- "Complexo do Alemão"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Ilha Do Governador"] <- "Ilha do Governador"
+
+regioes_ips_2020 <- merge(dados_geojson, dados_ips_2022, by.x = "nomera", by.y = "regiao_administrativa")
+
+ggplot() +
+  geom_sf(data = regioes_ips_2020, aes(fill = ips_geral)) +
+  geom_sf_text(data = regioes_ips_2020, aes(label = nomera), 
+               size = 3.5, color = "black", fontface = "bold", 
+               check_overlap = TRUE) +
+  scale_fill_gradientn(
+    colors = brewer.pal(9, "BuPu"),
+    values = scales::rescale(c(min(regioes_ips_2020$ips_geral), max(regioes_ips_2020$ips_geral))),
+    name = "IPS Geral"
+  ) +
+  theme_minimal() +
+  labs(title = "Mapa de Calor do IPS Geral por Região Administrativa (2022)") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+        legend.title = element_text(size = 12),
+        legend.text = element_text(size = 10))
+
 ```
 
 ## Análise PCA

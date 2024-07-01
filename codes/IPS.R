@@ -113,22 +113,22 @@ ggplot(ips_long, aes(x = as.factor(ano), y = valor, group = interaction(ano, var
        x = "Ano", y = "Valor")
 
 # Mapa de calor IPS
-dados_geojson <- st_read("mapa.geojson")
-dados_ips_2020 <- ips[ips$ano == 2022, ]
+dados_geojson <- st_read("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/mapa.geojson")
+dados_ips_2022 <- ips[ips$ano == 2022, ]
 # Substituir Maré por Complexo da Maré
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Maré"] <- "Complexo da Maré"
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Iraja"] <- "Irajá"
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Portuaria"] <- "Portuária"
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "São Cristovão"] <- "São Cristóvão"
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Barra Da Tijuca"] <- "Barra da Tijuca"
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Cidade De Deus"] <- "Cidade de Deus"
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Complexo Do Alemão"] <- "Complexo do Alemão"
-dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Ilha Do Governador"] <- "Ilha do Governador"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Maré"] <- "Complexo da Maré"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Iraja"] <- "Irajá"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Portuaria"] <- "Portuária"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "São Cristovão"] <- "São Cristóvão"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Barra Da Tijuca"] <- "Barra da Tijuca"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Cidade De Deus"] <- "Cidade de Deus"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Complexo Do Alemão"] <- "Complexo do Alemão"
+dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Ilha Do Governador"] <- "Ilha do Governador"
 
 # Achar um shapefile melhor se pá! Já que na base do shapefile tem Páqueta e não tem Rio de Janeiro
 
 
-regioes_ips_2020 <- merge(dados_geojson, dados_ips_2020, by.x = "nomera", by.y = "regiao_administrativa")
+regioes_ips_2020 <- merge(dados_geojson, dados_ips_2022, by.x = "nomera", by.y = "regiao_administrativa")
 
 ggplot() +
   geom_sf(data = regioes_ips_2020, aes(fill = ips_geral)) +
