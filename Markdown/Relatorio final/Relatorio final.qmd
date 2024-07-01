@@ -827,7 +827,7 @@ fviz_pca_biplot(pca_result,addlabels = TRUE)
 ```
 
 ### Agrupamento Hierárquico das Regiões Administrativas
-
+##### Utilizando-se do método hierárquico completo, é possível perceber que as regiões administrativas foram agrupadas em 4 clusters. 
 
 ```{r}
 #####Agrupando utilizando todas as variáveis #####
