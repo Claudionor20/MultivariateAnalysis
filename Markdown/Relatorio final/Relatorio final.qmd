@@ -24,7 +24,7 @@ Trabalho final da disciplina de Análise Multivariada, referente ao primeiro per
 
 # Questão 1 
 
-Nesta seção, demonstramos a direção discriminante de Fisher para discriminação linear entre duas populações. Consideramos duas populações $\pi_1$ e $\pi_2$ baseadas na amostra rotulada $( {(xj , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que $n_1 + n_2 = n$ e $n_i$ é o número de elementos da população $\pi_i$.
+Nesta seção, demonstramos a direção discriminante de Fisher para discriminação linear entre duas populações. Consideramos duas populações $\pi_1$ e $\pi_2$ baseadas na amostra rotulada $( {(x_j , \pi_i), \space j = 1, \ldots , n, \space i = 1, 2} )$, em que $n_1 + n_2 = n$ e $n_i$ é o número de elementos da população $\pi_i$.
 
 ## Considerações
 
@@ -147,7 +147,7 @@ $$
 \end{equation}
 $$
 
-Note que o denominador dessa equação é um escalar $1x1$, e portanto, a direção de $\alpha$ que maximiza a diferença das duas populações é dada pelo vetor $\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)$ pelo método de otimização restrita de Lagrange.
+Note que o denominador dessa equação é um escalar $1 \times 1$, e portanto, a direção de $\alpha$ que maximiza a diferença das duas populações é dada pelo vetor $\alpha = S_p^{-1}(\bar{x}_1 - \bar{x}_2)$ pelo método de otimização restrita de Lagrange.
 
 ## Conclusão
 
