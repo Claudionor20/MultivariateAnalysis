@@ -19,6 +19,8 @@ library(corrplot)
 library(caret)
 library(tidyr)
 library(sf)
+library(RColorBrewer)
+library(factoextra)
 
 #### ANÁLISE DESCRITIVA ####
 
@@ -127,7 +129,6 @@ dados_ips_2020$regiao_administrativa[dados_ips_2020$regiao_administrativa == "Il
 
 
 regioes_ips_2020 <- merge(dados_geojson, dados_ips_2020, by.x = "nomera", by.y = "regiao_administrativa")
-library(RColorBrewer)
 
 ggplot() +
   geom_sf(data = regioes_ips_2020, aes(fill = ips_geral)) +
@@ -175,6 +176,8 @@ rownames(IPS_d) <- ips_anos$ips_2016$regiao_administrativa
 pca_result <- PCA(IPS_d, ncp = ncol(IPS_d), graph = FALSE)
 var_out <- get_pca_var(pca_result)
 loadings <- var_out$coord
+corelacao_pca <- var_out$cor
+varia_pca <- row.names(corelacao_pca[abs(corelacao_pca[, "Dim.1"]) >= 0.8, ])
 
 # Calcular scores manualmente multiplicando a matriz original escalada pelos loadings
 scores_2016 <- as.data.frame(as.matrix(IPS_d) %*% as.matrix(loadings))
@@ -196,12 +199,6 @@ scores_2020 <- as.data.frame(as.matrix(IPS_2020) %*% as.matrix(loadings))
 
 scores_2022 <- as.data.frame(as.matrix(IPS_2022) %*% as.matrix(loadings))
 
-
-pca_result_2018 <- PCA(IPS_2018, ncp = ncol(IPS_2018), graph = FALSE)
-var_out_2018 <- get_pca_var(pca_result_2018)
-loadings_2018 <- var_out_2018$coord
-
-
 fviz_eig(pca_result, addlabels = TRUE, ylim = c(0, 50),main = "") #gráficos
 
 fviz_pca_var(pca_result, axes = c(1,2),col.var = "black",repel = TRUE) 
@@ -210,73 +207,6 @@ fviz_pca_ind(pca_result, axes = c(1,2))
 
 fviz_pca_biplot(pca_result,addlabels = TRUE) 
 
-
-#### Agrupamento por k-means ####
-
-# Guilherme
-
-# Supondo que a base de ips se chama "ips" e já está carregada
-
-# Filtrar os ips para os anos desejados
-anos <- c(2016, 2018, 2020, 2022)
-ips_filtrados <- ips %>% filter(ano %in% anos)
-
-# Lista para armazenar os resultados do k-means por ano
-clusters_por_ano <- list()
-
-# Função para calcular os convex hulls
-get_convex_hulls <- function(data) {
-  hulls <- data %>%
-    group_by(cluster) %>%
-    slice(chull(ips_geral, prop_mobilidade_urbana)) %>%
-    ungroup()
-  return(hulls)
-}
-
-# Aplicar k-means para cada ano separadamente
-for (ano_atual in anos) {
-  ips_ano <- ips_filtrados %>% filter(ano == ano_atual)
-  
-  # Selecionar as variáveis para o k-means
-  ips_kmeans <- ips_ano %>% select(ips_geral, prop_mobilidade_urbana)
-  
-  # Definir o número de clusters (k). Aqui usamos k = 3 como exemplo
-  k <- 3
-  
-  # Executar o k-means
-  set.seed(123) # Para reprodutibilidade
-  kmeans_result <- kmeans(ips_kmeans, centers = k)
-  
-  # Adicionar os resultados do cluster aos ips
-  ips_ano$cluster <- as.factor(kmeans_result$cluster)
-  
-  # Armazenar os ips do ano com os clusters
-  clusters_por_ano[[as.character(ano_atual)]] <- ips_ano
-}
-
-# Função para criar o gráfico de dispersão com contornos e escalas fixas
-plot_clusters <- function(ips, ano) {
-  hulls <- get_convex_hulls(ips)
-  ggplot(ips, aes(x = ips_geral, y = prop_mobilidade_urbana, color = cluster)) +
-    geom_point() +
-    geom_polygon(data = hulls, aes(fill = cluster, group = cluster), alpha = 0.2, color = NA) +
-    geom_path(data = hulls, aes(group = cluster), color = "black", linetype = "dashed") + # Adiciona os contornos tracejados
-    labs(title = paste("Clusters para o ano de", ano), x = "IPS Geral", y = "Proporção de Mobilidade Urbana") +
-    xlim(30, 100) + # Ajustar a escala do eixo x
-    ylim(0, 100) +    # Ajustar a escala do eixo y
-    theme_minimal()
-}
-
-# Criar os gráficos para cada ano
-plots <- lapply(names(clusters_por_ano), function(ano) {
-  plot_clusters(clusters_por_ano[[ano]], ano)
-})
-
-# Mostrar os gráficos
-for (plot in plots) {
-  print(plot)
-}
-
 #### Agrupamentos hierarquicos ####
 
 #####Agrupando utilizando todas as variáveis #####
@@ -284,15 +214,12 @@ for (plot in plots) {
 ips_c = ips_anos[["ips_2016"]][c(-1,-2,-3)]
 ips_c = scale(ips_c)
 row.names(ips_c) = ips_anos$ips_2016$regiao_administrativa
-
-dist_ipsc = dist(scores_2016)
-
-cluster_ips = hclust(dist_ipsc, method = "single")
 par(mfrow = c(1,1))
-plot(cluster_ips, main = "single")
 
-cluster_ips2 = hclust(dist_ipsc, method = "complete")
-plot(cluster_ips2, main = "complete")
+plot(cluster_ips2, main = "Modelo Hierárquico completo", xlab = "", ylab = "",sub = "", yaxt = "n", cex = 0.6)
+
+# Adicionar retângulos ao redor dos clusters
+rect.hclust(cluster_ips2, k = 4, border = 2:5) # Aqui, k define o número de clusters, ajuste conforme necessário
 
 cluster_ips3 = hclust(dist_ipsc, method = "average")
 
@@ -387,168 +314,211 @@ ind_tipo = data.frame(variavel = names(ips)[-c(1,2,3)], tipo = tipo)
 regioes = ips_anos$ips_2016$regiao_administrativa
 ips_tipos2016_long = list()
 ips_tipos2016 = list()
-####### SAUDE #######
-ips_tipos2016_long$saude = inner_join(ips_long, ind_tipo, by = "variavel") |> 
-  filter(tipo == "SAU" & ano == 2016) |> select(-tipo)
 
-ips_tipos2016$saude = ips_tipos2016_long$saude  |> 
-  tidyr::spread(key = variavel, value = valor) |> 
-  select(-ano, -regiao_administrativa)
+#
+library(CGPfunctions)
 
-fviz_cluster(list(data = ips_tipos2016$saude, cluster = clusters_ips), 
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
-  labs(title = "SAUDE")
+ips_cl = ips
+ips_cl$cluster = rep(clusters_ips, times = length(unique(ips$ano)))
 
-###### Saneamento Básico: SAN ######
+ips_clv = ips_cl |>  select(regiao_administrativa, ano, all_of(varia_pca), ips_geral, cluster)
 
-ips_tipos2016_long$saneamento = inner_join(ips_long, ind_tipo, by = "variavel") |> 
-  filter(tipo == "SAN" & ano == 2016) |> select(-tipo)
+ips_cl1 = filter(ips_cl, cluster == 1) |> select(regiao_administrativa, ano, all_of(varia_pca), ips_geral)
 
-ips_tipos2016$saneamento = ips_tipos2016_long$saneamento  |> 
-  tidyr::spread(key = variavel, value = valor) |> 
-  select(-ano, -regiao_administrativa)
+ips_cl1 |> 
+  mutate(ano = factor(ano),
+         ips_geral = round(ips_geral,1)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = ips_geral,
+                  Grouping = regiao_administrativa) +
+  labs(title = "IPS GERAL cluster 1", 
+       subtitle = "Região administrativa")
 
-fviz_cluster(list(data = ips_tipos2016$saneamento, cluster = clusters_ips), 
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
-  labs(title = "Saneamento Básico")
+ips_cl2 = filter(ips_cl, cluster == 2) |> select(regiao_administrativa, ano, all_of(varia_pca), ips_geral)
 
-###### Segurança: SEG ######
+ips_cl2 |> 
+  mutate(ano = factor(ano),
+         ips_geral = round(ips_geral,1)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = ips_geral,
+                  Grouping = regiao_administrativa) +
+  labs(title = "IPS GERAL cluster 2", 
+       subtitle = "Região administrativa")
 
-ips_tipos2016_long$seguranca = inner_join(ips_long, ind_tipo, by = "variavel") |> 
-  filter(tipo == "SEG" & ano == 2016) |> select(-tipo)
+ips_cl3 = filter(ips_cl, cluster == 3) |> select(regiao_administrativa, ano, all_of(varia_pca), ips_geral)
 
-ips_tipos2016$seguranca = ips_tipos2016_long$seguranca  |> 
-  tidyr::spread(key = variavel, value = valor) |> 
-  select(-ano, -regiao_administrativa)
+ips_cl3 |> 
+  mutate(ano = factor(ano),
+         ips_geral = round(ips_geral,1)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = ips_geral,
+                  Grouping = regiao_administrativa) +
+  labs(title = "IPS GERAL cluster 3", 
+       subtitle = "Região administrativa")
 
-fviz_cluster(list(data = ips_tipos2016$seguranca , cluster = clusters_ips), 
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
-  labs(title = "Segurança")
-###### Educação: EDU ######
+ips_cl4 = filter(ips_cl, cluster == 4) |> select(regiao_administrativa, ano, all_of(varia_pca), ips_geral)
 
-ips_tipos2016_long$educacao = inner_join(ips_long, ind_tipo, by = "variavel") |> 
-  filter(tipo == "EDU" & ano == 2016) |> select(-tipo)
+ips_cl4 |> 
+  mutate(ano = factor(ano),
+         ips_geral = round(ips_geral,1)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = ips_geral,
+                  Grouping = regiao_administrativa) +
+  labs(title = "IPS GERAL cluster 4", 
+       subtitle = "Região administrativa")
+colnames(ips_clv)
+ips_cl |> 
+  group_by(cluster,ano) |> 
+  summarise(m_ipsgeral = round(mean(ips_geral),1)) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = m_ipsgeral,
+                  Grouping = cluster) +
+  labs(title = "Média geral do ips 4", 
+       subtitle = "Região administrativa")
 
-ips_tipos2016$educacao = ips_tipos2016_long$educacao  |> 
-  tidyr::spread(key = variavel, value = valor) |> 
-  select(-ano, -regiao_administrativa)
+par(mfrow = c(2,2))
 
-fviz_cluster(list(data = ips_tipos2016$educacao, cluster = clusters_ips), 
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
-  labs(title = "Educação")
-###### Infraestrutura e Mobilidade: INF######
+a1 = ips_clv |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_vulnerabilidade_familiar,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_vulnerabilidade_familiar", 
+       subtitle = "Região administrativa")
 
-ips_tipos2016_long$infra = inner_join(ips_long, ind_tipo, by = "variavel") |> 
-  filter(tipo == "INF" & ano == 2016) |> select(-tipo)
+a2 = ips_clv |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_gravidez_adolescencia,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_gravidez_adolescencia", 
+       subtitle = "Região administrativa")
 
-ips_tipos2016$infra = ips_tipos2016_long$infra  |> 
-  tidyr::spread(key = variavel, value = valor) |> 
-  select(-ano, -regiao_administrativa)
+a3 = ips_cl |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_adensamento_habitacional_excessivo,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_adensamento_habitacional_excessivo", 
+       subtitle = "Região administrativa")
 
-
-fviz_cluster(list(data = ips_tipos2016$infra, cluster = clusters_ips), 
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
-  labs(title = "Infraestrutura e Mobilidade")
-
-###### Direitos e Inclusão Social: DIS ######
-
-ips_tipos2016_long$direito = inner_join(ips_long, ind_tipo, by = "variavel") |> 
-  filter(tipo == "DIS" & ano == 2016) |> select(-tipo)
-
-ips_tipos2016$direito = ips_tipos2016_long$direito  |> 
-  tidyr::spread(key = variavel, value = valor) |> 
-  select(-ano, -regiao_administrativa)
-
-
-fviz_cluster(list(data = ips_tipos2016$direito, cluster = clusters_ips), 
-             geom = "point", 
-             ellipse.type = "convex", 
-             palette = "jco", 
-             ggtheme = theme_minimal()) + 
-  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
-  labs(title = "Direitos e Inclusão Social")
-
-#####
-
-ips_tipos2016_long$saude$cluster = factor(clusters_ips)
-ips_tipos2016_long$saneamento$cluster = factor(clusters_ips)
-ips_tipos2016_long$seguranca$cluster = factor(clusters_ips)
-ips_tipos2016_long$educacao$cluster = factor(clusters_ips)
-ips_tipos2016_long$infra$cluster = factor(clusters_ips)
-ips_tipos2016_long$direito$cluster = factor(clusters_ips)
+a4 = ips_cl |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_alfabetizacao,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_alfabetizacao", 
+       subtitle = "Região administrativa")
 
 
-ggplot(ips_tipos2016_long$saude, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ variavel, scales = "free_y") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(title = "Indicadores de saude 2016",
-       x = "Cluster", y = "Valor")
+gridExtra::grid.arrange(a1,a2,a3,a4)
 
-ggplot(ips_tipos2016_long$saneamento, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ variavel, scales = "free_y") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(title = "Indicadores de saneamento 2016",
-       x = "Cluster", y = "Valor")
+g1 = ips_clv |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_frequencia_ensino_superior,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_frequencia_ensino_superior", 
+       subtitle = "Região administrativa")
 
-ggplot(ips_tipos2016_long$seguranca, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ variavel, scales = "free_y") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(title = "Indicadores de seguranca 2016",
-       x = "Cluster", y = "Valor")
+g2 = ips_clv |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_acesso_telefone_celular_fixo,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_acesso_telefone_celular_fixo", 
+       subtitle = "Região administrativa")
 
-ggplot(ips_tipos2016_long$educacao, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ variavel, scales = "free_y") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(title = "Indicadores de educacao 2016",
-       x = "Cluster", y = "Valor")
+g3 = ips_cl |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_pessoas_ensino_superior,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_pessoas_ensino_superior", 
+       subtitle = "Região administrativa")
 
-ggplot(ips_tipos2016_long$infra, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ variavel, scales = "free_y") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(title = "Indicadores de infra 2016",
-       x = "Cluster", y = "Valor")
+g4 = ips_cl |> 
+  filter(regiao_administrativa %in% c("Rocinha", "Lagoa", "Maré", "Méier")) |> 
+  mutate(ano = factor(ano)) |> 
+  newggslopegraph(Times = ano,
+                  Measurement = prop_acesso_internet,
+                  Grouping = regiao_administrativa) +
+  labs(title = "prop_acesso_internet", 
+       subtitle = "Região administrativa")
 
-ggplot(ips_tipos2016_long$direito, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
-  geom_line() +
-  geom_point() +
-  facet_wrap(~ variavel, scales = "free_y") +
-  theme_minimal() +
-  theme(legend.position = "none") +
-  labs(title = "Indicadores de direito 2016",
-       x = "Cluster", y = "Valor")
- 
+gridExtra::grid.arrange(g1,g2,g3,g4)
+
+
+#### Agrupamento por k-means ####
+
+# Guilherme
+
+# Supondo que a base de ips se chama "ips" e já está carregada
+
+# Filtrar os ips para os anos desejados
+anos <- c(2016, 2018, 2020, 2022)
+ips_filtrados <- ips %>% filter(ano %in% anos)
+
+# Lista para armazenar os resultados do k-means por ano
+clusters_por_ano <- list()
+
+# Função para calcular os convex hulls
+get_convex_hulls <- function(data) {
+  hulls <- data %>%
+    group_by(cluster) %>%
+    slice(chull(ips_geral, prop_mobilidade_urbana)) %>%
+    ungroup()
+  return(hulls)
+}
+
+# Aplicar k-means para cada ano separadamente
+for (ano_atual in anos) {
+  ips_ano <- ips_filtrados %>% filter(ano == ano_atual)
+  
+  # Selecionar as variáveis para o k-means
+  ips_kmeans <- ips_ano %>% select(ips_geral, prop_mobilidade_urbana)
+  
+  # Definir o número de clusters (k). Aqui usamos k = 3 como exemplo
+  k <- 3
+  
+  # Executar o k-means
+  set.seed(123) # Para reprodutibilidade
+  kmeans_result <- kmeans(ips_kmeans, centers = k)
+  
+  # Adicionar os resultados do cluster aos ips
+  ips_ano$cluster <- as.factor(kmeans_result$cluster)
+  
+  # Armazenar os ips do ano com os clusters
+  clusters_por_ano[[as.character(ano_atual)]] <- ips_ano
+}
+
+# Função para criar o gráfico de dispersão com contornos e escalas fixas
+plot_clusters <- function(ips, ano) {
+  hulls <- get_convex_hulls(ips)
+  ggplot(ips, aes(x = ips_geral, y = prop_mobilidade_urbana, color = cluster)) +
+    geom_point() +
+    geom_polygon(data = hulls, aes(fill = cluster, group = cluster), alpha = 0.2, color = NA) +
+    geom_path(data = hulls, aes(group = cluster), color = "black", linetype = "dashed") + # Adiciona os contornos tracejados
+    labs(title = paste("Clusters para o ano de", ano), x = "IPS Geral", y = "Proporção de Mobilidade Urbana") +
+    xlim(30, 100) + # Ajustar a escala do eixo x
+    ylim(0, 100) +    # Ajustar a escala do eixo y
+    theme_minimal()
+}
+
+# Criar os gráficos para cada ano
+plots <- lapply(names(clusters_por_ano), function(ano) {
+  plot_clusters(clusters_por_ano[[ano]], ano)
+})
+
+# Mostrar os gráficos
+for (plot in plots) {
+  print(plot)
+}
