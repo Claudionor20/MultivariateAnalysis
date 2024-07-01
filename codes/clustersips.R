@@ -199,4 +199,171 @@ plot(cluster_educacao2, labels = ips_educacao_reorg$regiao_administrativa, main 
 plot(cluster_infra2, labels = ips_infra_reorg$regiao_administrativa, main = "Método Single INFRAESTRUTURA", xlab = "", sub = "")
 plot(cluster_direito2, labels = ips_direito_reorg$regiao_administrativa, main = "Método Single DIREITO", xlab = "", sub = "")
 
+#####
+
+####### SAUDE #######
+ips_tipos2016_long$saude = inner_join(ips_long, ind_tipo, by = "variavel") |> 
+  filter(tipo == "SAU" & ano == 2016) |> select(-tipo)
+
+ips_tipos2016$saude = ips_tipos2016_long$saude  |> 
+  tidyr::spread(key = variavel, value = valor) |> 
+  select(-ano, -regiao_administrativa)
+
+fviz_cluster(list(data = ips_tipos2016$saude, cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
+  labs(title = "SAUDE")
+
+###### Saneamento Básico: SAN ######
+
+ips_tipos2016_long$saneamento = inner_join(ips_long, ind_tipo, by = "variavel") |> 
+  filter(tipo == "SAN" & ano == 2016) |> select(-tipo)
+
+ips_tipos2016$saneamento = ips_tipos2016_long$saneamento  |> 
+  tidyr::spread(key = variavel, value = valor) |> 
+  select(-ano, -regiao_administrativa)
+
+fviz_cluster(list(data = ips_tipos2016$saneamento, cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
+  labs(title = "Saneamento Básico")
+
+###### Segurança: SEG ######
+
+ips_tipos2016_long$seguranca = inner_join(ips_long, ind_tipo, by = "variavel") |> 
+  filter(tipo == "SEG" & ano == 2016) |> select(-tipo)
+
+ips_tipos2016$seguranca = ips_tipos2016_long$seguranca  |> 
+  tidyr::spread(key = variavel, value = valor) |> 
+  select(-ano, -regiao_administrativa)
+
+fviz_cluster(list(data = ips_tipos2016$seguranca , cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
+  labs(title = "Segurança")
+###### Educação: EDU ######
+
+ips_tipos2016_long$educacao = inner_join(ips_long, ind_tipo, by = "variavel") |> 
+  filter(tipo == "EDU" & ano == 2016) |> select(-tipo)
+
+ips_tipos2016$educacao = ips_tipos2016_long$educacao  |> 
+  tidyr::spread(key = variavel, value = valor) |> 
+  select(-ano, -regiao_administrativa)
+
+fviz_cluster(list(data = ips_tipos2016$educacao, cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
+  labs(title = "Educação")
+###### Infraestrutura e Mobilidade: INF######
+
+ips_tipos2016_long$infra = inner_join(ips_long, ind_tipo, by = "variavel") |> 
+  filter(tipo == "INF" & ano == 2016) |> select(-tipo)
+
+ips_tipos2016$infra = ips_tipos2016_long$infra  |> 
+  tidyr::spread(key = variavel, value = valor) |> 
+  select(-ano, -regiao_administrativa)
+
+
+fviz_cluster(list(data = ips_tipos2016$infra, cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
+  labs(title = "Infraestrutura e Mobilidade")
+
+###### Direitos e Inclusão Social: DIS ######
+
+ips_tipos2016_long$direito = inner_join(ips_long, ind_tipo, by = "variavel") |> 
+  filter(tipo == "DIS" & ano == 2016) |> select(-tipo)
+
+ips_tipos2016$direito = ips_tipos2016_long$direito  |> 
+  tidyr::spread(key = variavel, value = valor) |> 
+  select(-ano, -regiao_administrativa)
+
+
+fviz_cluster(list(data = ips_tipos2016$direito, cluster = clusters_ips), 
+             geom = "point", 
+             ellipse.type = "convex", 
+             palette = "jco", 
+             ggtheme = theme_minimal()) + 
+  geom_text(aes(label = regioes), vjust = -0.5, hjust = 0.5)+
+  labs(title = "Direitos e Inclusão Social")
+
+#####
+
+ips_tipos2016_long$saude$cluster = factor(clusters_ips)
+ips_tipos2016_long$saneamento$cluster = factor(clusters_ips)
+ips_tipos2016_long$seguranca$cluster = factor(clusters_ips)
+ips_tipos2016_long$educacao$cluster = factor(clusters_ips)
+ips_tipos2016_long$infra$cluster = factor(clusters_ips)
+ips_tipos2016_long$direito$cluster = factor(clusters_ips)
+
+
+ggplot(ips_tipos2016_long$saude, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ variavel, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Indicadores de saude 2016",
+       x = "Cluster", y = "Valor")
+
+ggplot(ips_tipos2016_long$saneamento, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ variavel, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Indicadores de saneamento 2016",
+       x = "Cluster", y = "Valor")
+
+ggplot(ips_tipos2016_long$seguranca, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ variavel, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Indicadores de seguranca 2016",
+       x = "Cluster", y = "Valor")
+
+ggplot(ips_tipos2016_long$educacao, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ variavel, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Indicadores de educacao 2016",
+       x = "Cluster", y = "Valor")
+
+ggplot(ips_tipos2016_long$infra, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ variavel, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Indicadores de infra 2016",
+       x = "Cluster", y = "Valor")
+
+ggplot(ips_tipos2016_long$direito, aes(x = cluster, y = valor, group = interaction(clusters_ips, variavel), color = cluster)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ variavel, scales = "free_y") +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  labs(title = "Indicadores de direito 2016",
+       x = "Cluster", y = "Valor")
+
 

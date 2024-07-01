@@ -6,6 +6,9 @@ library(ggplot2)
 library(cluster)
 library(gridExtra)
 library(factoextra)
+library(labelled)
+library(e1071)
+
 
 ####Base de dados  ####
 data(Wolves)
@@ -25,6 +28,56 @@ Wolves |> ggplot(aes(x = group))+
   labs( y = "Frequência", x = "Grupo")+
   theme_minimal()
 
+#
+
+str(Wolves[,4:12])
+library(dplyr)
+library(tidyr)
+library(labelled)
+
+# Função para remover rótulos e armazená-los em um vetor
+remove_labels_and_store <- function(df) {
+  labels <- sapply(df, function(x) attr(x, "label"))
+  df[] <- lapply(df, function(x) {
+    if (is.labelled(x)) {
+      as.numeric(x)
+    } else {
+      as.numeric(x) # Garantir que as colunas sejam convertidas para numeric
+    }
+  })
+  return(list(data = df, labels = labels))
+}
+
+# Função para calcular medidas estatísticas
+medidas_resumo <- function(data) {
+  result <- remove_labels_and_store(data)
+  data <- result$data
+  labels <- result$labels
+  
+  # Transformar os dados para o formato longo
+  data_long <- data %>%
+    pivot_longer(everything(), names_to = "variable", values_to = "value")
+  
+  # Calcular medidas estatísticas para cada variável
+  medidas <- data_long %>%
+    group_by(variable) %>%
+    summarise(
+      media = mean(value),
+      dp = sd(value),
+      coef = (mean(value) / sd(value)) * 100,
+      mediana = median(value),
+      IQQ = paste(quantile(value, 0.25), quantile(value, 0.75), sep = "-"),
+      ASS = 3 * (mean(value) - median(value)) / sd(value)
+    )
+  
+  # Adicionar os rótulos como uma nova coluna
+  medidas$variable  <- labels[medidas$variable]
+  
+  return(medidas)
+}
+
+# Testar a função
+medidas_resumo(Wolves[, 4:12])
 
 #Histogramas - quantitativas
 par(mfrow = c(3,3))

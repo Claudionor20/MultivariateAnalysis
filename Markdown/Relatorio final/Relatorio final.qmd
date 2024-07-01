@@ -16,6 +16,10 @@ editor_options:
     wrap: 72
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+```
+
 Trabalho final da disciplina de Análise Multivariada, referente ao primeiro período de 2024. Esse trabalho é uma colaboração de Caio Falcão, Claudionor Ferreira, Guilherme Ceacero e Paulo Martinez. 
 
 # Questão 1 
@@ -161,7 +165,10 @@ library(gridExtra)
 library(factoextra)
 library(mclust)
 library(MVN)
-
+library(flextable)
+library(MASS)
+library(labelled)
+library(tidyr)
 ```
 
 Após realizar a importação da base de dados, verificamos se a base possui valores faltantes e se as variáveis estão corretamente formatadas: 
@@ -192,7 +199,69 @@ Observa-se que o grupo mais presente na amostra são de lobos machos da localiza
 Para as variáveis quantitativas, considere as seguintes medidas de resumo:
 
 ```{r medidas}
-summary(Wolves[,4:12]) ### Melhorar essas medidas -> dp, cv, assimetria
+
+rotulos <- function(df) {
+  labels <- sapply(df, function(x) attr(x, "label"))
+  df[] <- lapply(df, function(x) {
+    if (is.labelled(x)) {
+      as.numeric(x)
+    } else {
+      as.numeric(x) # Garantir que as colunas sejam convertidas para numeric
+    }
+  })
+  return(list(data = df, labels = labels))
+}
+
+# Função para calcular medidas estatísticas
+medidas_resumo <- function(data) {
+  result <- rotulos(data)
+  data <- result$data
+  labels <- result$labels
+  
+  # Transformar os dados para o formato longo
+  data_long <- data %>%
+    pivot_longer(everything(), names_to = "variavel", values_to = "value")
+  
+  # Calcular medidas estatísticas para cada variável
+  medidas <- data_long %>%
+    group_by(variavel) %>%
+    summarise(
+      media = mean(value),
+      dp = sd(value),
+      coef = (mean(value) / sd(value)) * 100,
+      mediana = median(value),
+      IQQ = paste(quantile(value, 0.25), quantile(value, 0.75), sep = "-"),
+      ASS = 3 * (mean(value) - median(value)) / sd(value)
+    )
+  
+  # Adicionar os rótulos como uma nova coluna
+  medidas$variavel  <- labels[medidas$variavel]
+  
+  return(medidas)
+}
+
+# Testar a função
+medidas_res = medidas_resumo(Wolves[, 4:12])
+
+medidas_res |> 
+  flextable() |>  
+  theme_vanilla() |>  
+  autofit() |> 
+  set_caption(caption = "Medidas resumos base Wolves") |> 
+  color(j = 1, color = "darkblue") |> # Colorir a coluna das variáveis
+   set_header_labels(
+    variable = "Variável",
+    media = "Média",
+    dp = "Desvio Padrão",
+    coef = "Cv (%)",
+    mediana = "Mediana",
+    IQQ = "Intervalo Interquartil",
+    ASS = "Assimetria",
+    label = "Variável"
+  ) |> 
+  colformat_double(
+  digits = 2
+) 
 ```
 
 Além das medidas resumos, pode ser de interesse realizar uma análise gráfica nos dados. Para isso, veja o histograma das variáveis: 
@@ -292,6 +361,7 @@ X = as.matrix(X)
 fviz_nbclust(X, kmeans, method = "wss")
 ```
 Pelo gráfico parece razoável escolher 4 clusters
+
 ```{r clustering}
 
 K = 4
@@ -299,7 +369,8 @@ K = 4
 km_res <- kmeans(X, centers = K)
 
 # Plotar os clusters fornecidos pelo K-means
-plot(X, col = km_res$cluster, pch = 16, main = "Clusters K-means")
+plot(X, col = km_res$cluster, pch = 16, main = "Clusters K-means", 
+     xlab = "Palatal length", ylab = "postpalatal length")
 
 # Plotar os centróides dos grupos
 points(km_res$centers, col = 1:K, pch = 8, cex = 2)
@@ -333,7 +404,7 @@ hc_complete <- hclust(dist_matrix, method = "complete")
 plot(hc_complete, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
 ```
 
-Com os resultados obtidos, é então possível realizar o agrupamento. Para isso, considere como critério a medida de dissilhiaridade. Sendo assim, ficaremos com o total de 3 grupos distintos. 
+Com os resultados obtidos, é então possível realizar o agrupamento. Para isso, considere como critério a medida de dissimilaridade Sendo assim, ficaremos com o total de 3 grupos distintos. 
 
 ## Comparação do k-means e do agrupamento hierárquico
 
@@ -343,11 +414,11 @@ Para fazer a comparação, primeiro iremos atribuir as observações aos seus gr
 # Plotar o gráfico de agrupamento usando fviz_cluster
 fviz_cluster(km_res, data = X,
              ggtheme = theme_minimal(),
-             main = "Gráfico de Agrupamento")
+             main = "Agrupamento por K-means")
 
 fviz_cluster(list(data = Xh, cluster = cutree(hc_complete, k = 3)),
              ggtheme = theme_minimal(),
-             main = "Hierarchical Clustering")
+             main = "Agrupamento hierárquico")
 
 ```
 
@@ -402,9 +473,32 @@ plot(hc_avg, main = "Average ligação com todas as variáveis", sub = "", xlab 
 
 ## Cortando as árvores
 
-Vemos métodos de ligações diferentes utilizando variáveis diferentes, a fim de comparação, considere os agrupamentos utilizando a ligação completa com números de cluster 3 e 4.  
+Vemos métodos de ligações diferentes utilizando variáveis diferentes, a fim de comparação, considere os agrupamentos utilizando a ligação completa com números de cluster 2 e 3.  
 
 Primeiro, é realizado o corte no contexto das variáveis consumo de leite e frutas/legumes.
+```{r k23 leite}
+plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
+abline(h = 2.5, col = "red", lty = 2) 
+abline(h = 2.1, col = "blue", lty = 2) 
+legend("topright", legend = c("2 grupos", "3 grupos"), col = c("red", "blue"), lty = c(2, 3), bty = "n")
+```
+Dessa forma, para 2 $clusters$ temos:
+
+```{r}
+plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
+rect.hclust(hc_FL, k = 2, border = 2:4)
+```
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México, o segundo $cluster$ com Espanha, Reino Unido, Noruega, Países Baixos, França e Estados Unidos.  
+
+Já para 3 $clusters$ temos:
+
+```{r}
+plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
+rect.hclust(hc_FL, k = 3, border = 2:5)
+```
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México, o segundo $cluster$ com Espanha e o terceiro com Reino Unido, Noruega, Países Baixos, França e Estados Unidos.
+
+
 ```{r cutTree complete}
 #k=2
 clustersFL_2 <- cutree(hc_FL, k = 2)
@@ -412,26 +506,80 @@ dados$clustersFL_2 <- clustersFL_2
 #k = 3
 clustersFL_3 <- cutree(hc_FL, k = 3)
 dados$clustersFL_3 <- clustersFL_3
+
+dados = dados |> dplyr::select(pais,clustersFL_2,clustersFL_3)
+
+flextable(dados) %>%
+  theme_vanilla() %>%
+  autofit() %>%
+  set_caption(caption = "Corte usando apenas Leites e legumes/frutas") %>%
+  color(j = 1, color = "darkblue") |> 
+  set_header_labels(
+    pais = "País",
+    clustersFL_2 = "2 clusters",
+    clustersFL_3 = "3 clusters"
+  ) %>%
+  colformat_double(digits = 2)
 ```
 
 Ainda, fazendo o corte pra todas as variáveis: 
 
-```{r cutTree avg}
+```{r k34 tudo}
+plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
+abline(h = 7.65, col = "red", lty = 2) 
+abline(h = 5, col = "blue", lty = 2) 
+legend("topright", legend = c("2 grupos", "3 grupos"), col = c("red", "blue"), lty = c(2, 3), bty = "n")
+```
+Dessa forma, para 2 $clusters$ temos:
+
+```{r}
+plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
+rect.hclust(hc_All, k = 2, border = 2:4)
+```
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, em quanto o segundo é formado pelos demais países.
+
+Já para 3 $clusters$ temos:
+
+```{r}
+plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
+rect.hclust(hc_FL, k = 3, border = 2:5)
+```
+Sendo assim, teriamos o primeiro $cluster$ com Hungria, já o segundo $cluster$ com Espanha, Países Baixos, França e Estados Unidos, e o terceiro com Reino Unido, Noruega, Japão e México.
+
+Ainda, 
+
+```{r}
 #k = 2
 clustersAll_2 <- cutree(hc_All, k = 2)
-dados$clustersAll_2 <- clustersAll_2
+dados2 = dados
+dados2$clustersAll_2 <- clustersAll_2
 
 #k = 3
 clustersAll_3 <- cutree(hc_All, k = 3)
-dados$clustersAll_3 <- clustersAll_3
+dados2$clustersAll_3 <- clustersAll_3
 
+dados2 = dados2 |> dplyr::select(pais,clustersAll_2,clustersAll_3)
+
+flextable(dados2) %>%
+  theme_vanilla() %>%
+  autofit() %>%
+  set_caption(caption = "Corte usando todas as variáveis") %>%
+  color(j = 1, color = "darkblue") |> 
+  set_header_labels(
+    pais = "País",
+    clustersFL_2 = "2 clusters",
+    clustersFL_3 = "3 clusters"
+  ) %>%
+  colformat_double(digits = 2)
 ```
+
+
 
 ## Visualização gráfico 
 
 ```{r}
 
-c1 = fviz_cluster(list(data = dados_LF, cluster = clustersFL_2), 
+fviz_cluster(list(data = dados_LF, cluster = clustersFL_2), 
              geom = "point", 
              ellipse.type = "convex", 
              palette = "jco", 
@@ -439,7 +587,7 @@ c1 = fviz_cluster(list(data = dados_LF, cluster = clustersFL_2),
   geom_text(aes(label = rownames(dados_LF)), vjust = -0.5, hjust = 0.5)+
   labs(title = "Leite e fruta/legumes")
 
-c2 = fviz_cluster(list(data = dados_LF, cluster = clustersFL_3), 
+fviz_cluster(list(data = dados_LF, cluster = clustersFL_3), 
              geom = "point", 
              ellipse.type = "convex", 
              palette = "jco", 
@@ -448,7 +596,7 @@ c2 = fviz_cluster(list(data = dados_LF, cluster = clustersFL_3),
   labs(title = "Leite e fruta/legumes")
 
 
-c3 = fviz_cluster(list(data = dados_All, cluster = clustersAll_2), 
+fviz_cluster(list(data = dados_All, cluster = clustersAll_2), 
              geom = "point", 
              ellipse.type = "convex", 
              palette = "jco", 
@@ -457,7 +605,7 @@ c3 = fviz_cluster(list(data = dados_All, cluster = clustersAll_2),
   labs(title = "Todas as variáveis")
 
 
-c4 = fviz_cluster(list(data = dados_All, cluster = clustersAll_3), 
+fviz_cluster(list(data = dados_All, cluster = clustersAll_3), 
              geom = "point", 
              ellipse.type = "convex", 
              palette = "jco", 
@@ -465,7 +613,6 @@ c4 = fviz_cluster(list(data = dados_All, cluster = clustersAll_3),
   geom_text(aes(label = rownames(dados_LF)), vjust = -0.5, hjust = 0.5)+
   labs(title = "Todas as variáveis")
 
-grid.arrange(c1,c2,c3,c4)
 ```
 
 # Questão 4 
@@ -537,7 +684,7 @@ ips |>
 
 ```{r}
 ips_geral <- ips|>
-  select(ano,ips_geral)
+  dplyr::select(ano,ips_geral)
 
 ips_geral|>
   ggplot(aes(x = as.factor(ano), y = ips_geral)) +
