@@ -4,10 +4,10 @@
 
 ips= read.csv(file = "https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/IPS.csv", sep = ';')
 
-ips_anos = list(ips_2016 = filter(ips, ano == 2016), 
-                ips_2018 = filter(ips, ano == 2018),
-                ips_2020 = filter(ips, ano == 2020), 
-                ips_2022 = filter(ips, ano == 2022))
+ips_anos = list(ips_2016 = dplyr::filter(ips, ano == 2016), 
+                ips_2018 = dplyr::filter(ips, ano == 2018),
+                ips_2020 = dplyr::filter(ips, ano == 2020), 
+                ips_2022 = dplyr::filter(ips, ano == 2022))
 
 names(ips)
 # Importando pacotes
@@ -167,6 +167,8 @@ print(nomes_variaveis_correlacionadas)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
+library(factoextra)
+library(FactoMineR)
 
 # Remover colunas categóricas e escalar os dados
 IPS_d <- scale(ips_anos$ips_2016[,-c(1,2,3)])
@@ -216,14 +218,14 @@ ips_c = scale(ips_c)
 row.names(ips_c) = ips_anos$ips_2016$regiao_administrativa
 par(mfrow = c(1,1))
 
+dist_ipsc = dist(scores_2016)
+
+cluster_ips2 = hclust(dist_ipsc, method = "complete")
+
 plot(cluster_ips2, main = "Modelo Hierárquico completo", xlab = "", ylab = "",sub = "", yaxt = "n", cex = 0.6)
 
 # Adicionar retângulos ao redor dos clusters
 rect.hclust(cluster_ips2, k = 4, border = 2:5) # Aqui, k define o número de clusters, ajuste conforme necessário
-
-cluster_ips3 = hclust(dist_ipsc, method = "average")
-
-plot(cluster_ips3, main = "avg")
 clusters_ips <- cutree(cluster_ips2, k = 4)
 
 # Adicionar os clusters aos scores
@@ -374,7 +376,7 @@ ips_cl |>
   newggslopegraph(Times = ano,
                   Measurement = m_ipsgeral,
                   Grouping = cluster) +
-  labs(title = "Média geral do ips 4", 
+  labs(title = "Média do IPS Geral por Cluster", 
        subtitle = "Região administrativa")
 
 par(mfrow = c(2,2))
