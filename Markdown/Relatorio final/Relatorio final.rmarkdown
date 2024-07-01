@@ -20,6 +20,7 @@ editor_options:
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 ```
 
+
 Trabalho final da disciplina de Análise Multivariada, referente ao
 primeiro período de 2024. Esse trabalho é uma colaboração de Caio
 Falcão, Claudionor Ferreira, Guilherme Ceacero e Paulo Martinez.
@@ -187,6 +188,7 @@ resultante na projeção é a direção discriminante de Fisher.
 
 # Questão 2
 
+
 ```{r bibliotecas, warning=FALSE}
 library(candisc) #base de dados wolves
 library(dplyr)
@@ -202,9 +204,11 @@ library(labelled)
 library(tidyr)
 ```
 
+
 Após realizar a importação da base de dados, verificamos se a base
 possui valores faltantes e se as variáveis estão corretamente
 formatadas:
+
 
 ```{r base1, warning=FALSE}
 data(Wolves) #base da biblioteca candisc
@@ -213,12 +217,14 @@ naniar::miss_var_summary(Wolves)
 str(Wolves)
 ```
 
+
 Com a base devidamente importada e sem a presença de valores faltantes,
 prosseguimos com a análise descritiva:
 
 ## Análise descritiva:
 
 Primeiro, verificamos as variáveis qualitativas da base de dados:
+
 
 ```{r grupos}
 table(Wolves$sex)
@@ -230,11 +236,13 @@ Wolves |> ggplot(aes(x = group))+
   theme_minimal()
 ```
 
+
 Observa-se que o grupo mais presente na amostra são de lobos machos da
 localização "ar".
 
 Para as variáveis quantitativas, considere as seguintes medidas de
 resumo:
+
 
 ```{r medidas}
 
@@ -302,8 +310,10 @@ medidas_res |>
 ) 
 ```
 
+
 Além das medidas resumos, pode ser de interesse realizar uma análise
 gráfica nos dados. Para isso, veja o histograma das variáveis:
+
 
 ```{r histograma}
 par(mfrow = c(3,3))
@@ -319,8 +329,10 @@ for(i in 1:ncol(Wolves)){
 }
 ```
 
+
 Surge também, a necessidade de verificar a correlação entre as
 variáveis.
+
 
 ```{r correlacao}
 pairs(Wolves[,4:12], 
@@ -330,7 +342,9 @@ corrplot::corrplot(cor(Wolves[,4:12]), method = "square" , order = "hclust", tl.
 
 ```
 
+
 Por fim, considere o boxplot das variáveis separadas por grupo.
+
 
 ```{r boxplot}
 plots <- list()
@@ -352,10 +366,12 @@ library(gridExtra)
 do.call("grid.arrange", c(plots, ncol = 3))
 ```
 
+
 ## Análise de discriminante
 
 O primeiro passo para realizar a análise de discriminante é verificar a
 normalidade dos dados.
+
 
 ```{r teste de normalidade}
 N_W <- Wolves[,4:length(Wolves)]
@@ -390,7 +406,9 @@ diag(prop.table(ta,1))
 caret::confusionMatrix(predict(spe.lda)$class, Wolves$group)
 ```
 
+
 ## K-means
+
 
 ```{r ncluster}
 #### K-means ####
@@ -403,7 +421,9 @@ X = as.matrix(X)
 fviz_nbclust(X, kmeans, method = "wss")
 ```
 
+
 Pelo gráfico parece razoável escolher 4 clusters
+
 
 ```{r clustering}
 
@@ -421,10 +441,12 @@ points(km_res$centers, col = 1:K, pch = 8, cex = 2)
 
 ```
 
+
 ## Agrupamento hierárquico
 
 Agora, o objetivo será realizar um agrumento hierarquico nos dados. Para
 isso, primeiro serão realizadas algumas mudanças na base de dados.
+
 
 ```{r}
 ##como numeric
@@ -438,9 +460,11 @@ Xh = Xh |>
 Xh = scale(Xh)
 ```
 
+
 Veja que os dados foram padronizados, ... Para realizar o agrupamento,
 primeiro é calculada a matriz de distâncias, depois prossegue-se com o
 algoritmo de ligação.
+
 
 ```{r}
 dist_matrix <- dist(Xh)
@@ -450,6 +474,7 @@ hc_complete <- hclust(dist_matrix, method = "complete")
 plot(hc_complete, main = "Complete Linkage Hierarchical Clustering", sub = "", xlab = "")
 ```
 
+
 Com os resultados obtidos, é então possível realizar o agrupamento. Para
 isso, considere como critério a medida de dissimilaridade Sendo assim,
 ficaremos com o total de 3 grupos distintos.
@@ -458,6 +483,7 @@ ficaremos com o total de 3 grupos distintos.
 
 Para fazer a comparação, primeiro iremos atribuir as observações aos
 seus grupos encontrados pelos algoritmos.
+
 
 ```{r}
 
@@ -472,7 +498,9 @@ fviz_cluster(list(data = Xh, cluster = cutree(hc_complete, k = 3)),
 
 ```
 
+
 # Questão 3
+
 
 ```{r leitura3}
 dados = read.table("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/bases/alimentos.txt", header = T)
@@ -480,10 +508,12 @@ row.names(dados)=dados$pais
 head(dados)
 ```
 
+
 ## Hierarquia parcial
 
 Em um primeiro momento, será de interesse construir um modelo
 hierárquico utilizando apenas as variáveis leite e fruta/legumes.
+
 
 ```{r hir_leiteFL}
 dados_LF = dplyr::select(dados, lech, fleg)
@@ -495,10 +525,12 @@ hc_FL = hclust(dist_matrix, method = "complete")
 plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
 ```
 
+
 ## Hierarquia completa
 
 É possível prosseguir com a análise considerando todas as variáveis.
 Considere, então, o método de ligação completo.
+
 
 ```{r hier_ALL}
 dados_All = dplyr::select(dados, -pais)
@@ -510,10 +542,12 @@ plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab
 
 ```
 
+
 ## Hierarquica completa com average
 
 Agora, o objetivo será realizar o agrupamento com o método de ligação
 média, isto é, metodo $average$.
+
 
 ```{r hier_avg}
 Xa = dplyr::select(dados, -pais)
@@ -525,6 +559,7 @@ hc_avg = hclust(dist_matrix_avg, method = "average")
 plot(hc_avg, main = "Average ligação com todas as variáveis", sub = "", xlab = "")
 ```
 
+
 ## Cortando as árvores
 
 Vemos métodos de ligações diferentes utilizando variáveis diferentes, a
@@ -534,6 +569,7 @@ completa com números de cluster 2 e 3.
 Primeiro, é realizado o corte no contexto das variáveis consumo de leite
 e frutas/legumes.
 
+
 ```{r k23 leite}
 plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
 abline(h = 2.5, col = "red", lty = 2) 
@@ -541,12 +577,15 @@ abline(h = 2.1, col = "blue", lty = 2)
 legend("topright", legend = c("2 grupos", "3 grupos"), col = c("red", "blue"), lty = c(2, 3), bty = "n")
 ```
 
+
 Dessa forma, para 2 $clusters$ temos:
+
 
 ```{r}
 plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
 rect.hclust(hc_FL, k = 2, border = 2:4)
 ```
+
 
 Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México,
 o segundo $cluster$ com Espanha, Reino Unido, Noruega, Países Baixos,
@@ -554,14 +593,17 @@ França e Estados Unidos.
 
 Já para 3 $clusters$ temos:
 
+
 ```{r}
 plot(hc_FL, main = "Ligação completa usando Leite e Frutas/Legumes", sub = "", xlab = "")
 rect.hclust(hc_FL, k = 3, border = 2:5)
 ```
 
+
 Sendo assim, teriamos o primeiro $cluster$ com Hungria, Japão e México,
 o segundo $cluster$ com Espanha e o terceiro com Reino Unido, Noruega,
 Países Baixos, França e Estados Unidos.
+
 
 ```{r cutTree complete}
 #k=2
@@ -586,7 +628,9 @@ flextable(dados) %>%
   colformat_double(digits = 2)
 ```
 
+
 Ainda, fazendo o corte pra todas as variáveis:
+
 
 ```{r k34 tudo}
 plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
@@ -595,28 +639,34 @@ abline(h = 5, col = "blue", lty = 2)
 legend("topright", legend = c("2 grupos", "3 grupos"), col = c("red", "blue"), lty = c(2, 3), bty = "n")
 ```
 
+
 Dessa forma, para 2 $clusters$ temos:
+
 
 ```{r}
 plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
 rect.hclust(hc_All, k = 2, border = 2:4)
 ```
 
+
 Sendo assim, teriamos o primeiro $cluster$ com Hungria, em quanto o
 segundo é formado pelos demais países.
 
 Já para 3 $clusters$ temos:
+
 
 ```{r}
 plot(hc_All, main = "Ligação completa com todas as variáveis", sub = "", xlab = "")
 rect.hclust(hc_FL, k = 3, border = 2:5)
 ```
 
+
 Sendo assim, teriamos o primeiro $cluster$ com Hungria, já o segundo
 $cluster$ com Espanha, Países Baixos, França e Estados Unidos, e o
 terceiro com Reino Unido, Noruega, Japão e México.
 
 Ainda,
+
 
 ```{r}
 #k = 2
@@ -643,7 +693,9 @@ flextable(dados2) %>%
   colformat_double(digits = 2)
 ```
 
+
 ## Visualização gráfico
+
 
 ```{r}
 
@@ -683,11 +735,13 @@ fviz_cluster(list(data = dados_All, cluster = clustersAll_3),
 
 ```
 
+
 # Questão 4
 
 ### Bases
 
 Considere as bases a serem utilizadas na análise
+
 
 ```{r bibliotecas4, warning=FALSE}
 require(dplyr)
@@ -714,9 +768,11 @@ ips_anos = list(ips_2016 = dplyr::filter(ips, ano == 2016),
                 ips_2022 = dplyr::filter(ips, ano == 2022))
 ```
 
+
 ## Análise Descritiva de Dados
 
 ### Média de IPS ao longo dos anos por região administrativa
+
 
 ```{r}
 ips |>
@@ -733,7 +789,9 @@ ips |>
 
 ```
 
+
 ### Evolução anual do IPS de cada regisão administrativa
+
 
 ```{r fig.width=15, fig.height=8}
 ips |>
@@ -759,7 +817,9 @@ ips |>
   facet_wrap(~ regiao_administrativa, scales = "free_y", ncol = 6)  
 ```
 
+
 ### Boxplot dos indicadores de IPS por ano
+
 
 ```{r}
 ips_geral <- ips|>
@@ -783,7 +843,9 @@ ips_geral|>
   )
 ```
 
+
 ### Histogramas
+
 
 ```{r fig.width=12, fig.height=8}
 data_long <- melt(ips, id.vars = c("ano", "regiao_administrativa"))
@@ -799,7 +861,9 @@ ggplot(data_long, aes(x = value)) +
 ```
 
 
+
 ### Mapa de Calor da variável IPS para o ano de 2022 por região administrativa
+
 
 ```{r}
 dados_geojson <- st_read("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/mapa.geojson")
@@ -835,10 +899,12 @@ ggplot() +
 
 ```
 
+
 ## Análise PCA
 
 ### Componentes Principais e Municípios
 ##### Com base no gráfico de 2016 ,é possível perceber que o IPS é bastante influenciado pela primeira componente principal. Essa componente trata majoritariamente do Acesso a educação e Informação. Diante disso, conclui-se que regiões como Lago, Botafogo e Copacabana possuem um alto IPS devido, em grande parte, aos altos indices de acesso a educação e informação. Em contraste com isso, as regiões como Jacarezinho, Rocinha e Complexo do Alemão possuem um IPS mais baixo, em maioria, devido a falta desses recursos.
+
 
 ```{r}
 # Remover colunas categóricas e escalar os dados
@@ -865,8 +931,10 @@ rownames(ips_anos$ips_2022) <- ips_anos$ips_2016$regiao_administrativa
 fviz_pca_biplot(pca_result,addlabels = TRUE)
 ```
 
+
 ### Agrupamento Hierárquico das Regiões Administrativas
 ##### Utilizando-se do método hierárquico completo, é possível perceber que as regiões administrativas foram agrupadas em 4 clusters. 
+
 
 ```{r}
 #####Agrupando utilizando todas as variáveis #####
@@ -882,8 +950,10 @@ plot(cluster_ips2, main = "Modelo Hierárquico completo", xlab = "", ylab = "",s
 rect.hclust(cluster_ips2, k = 4, border = 2:5) # Aqui, k define o número de clusters, ajuste conforme necessário
 ```
 
+
 ### Gráfico Média do IPS Geral por Cluster Hierárquico ao Decorrer dos Anos
 ##### A partir do gráfico, é possível perceber que o cluster 1 possui uma média de IPS Geral mais alta, enquanto o cluster 4 possui a menor média.
+
 
 ```{r}
 clusters_ips <- cutree(cluster_ips2, k = 4)
@@ -902,9 +972,11 @@ ips_cl |>
   labs(title = "Média do IPS Geral por Cluster", 
        subtitle = "Região administrativa")
 ```
+
 ###### Nas análises a seguir, as regiões administrativas Rocinha, Maré, Lagoa e Méier foram escolhidas para uma avaliação detalhada do ###### comportamento de seus indicadores ao longo dos anos.
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Positivamente na Rocinha, Maré, Lagoa e Méier
+
 
 ```{r}
 
@@ -951,10 +1023,12 @@ gridExtra::grid.arrange(a1,a2,a3,a4)
 ```
 
 
+
 ###### Veja que a proporção de ocorrência de gravidez na adolescência caiu muito, em resposta principalmente à melhora no acesso à informação.
 
 
 ### Comportamento dos Indicadores que mais Impactam o PC1 Negativamente na Rocinha, Maré, Lagoa e Méier
+
 
 ```{r}
 ips_clv = ips_cl |>  dplyr::select(regiao_administrativa, ano, all_of(varia_pca), ips_geral, cluster)
@@ -1000,4 +1074,6 @@ gridExtra::grid.arrange(g1,g2,g3,g4)
 ```
 
 
+
 ###### O impacto é negativo porque o acesso ao ensino superior e a meios de comunicação/informação (internet e celular) é ainda muito limitado quando comparado com outras regiões do Rio de Janeiro.
+
