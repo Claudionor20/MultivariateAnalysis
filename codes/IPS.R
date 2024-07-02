@@ -1,3 +1,22 @@
+# Importando pacotes
+
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+library(corrplot)
+library(caret)
+library(tidyr)
+library(sf)
+library(gridExtra)
+library(RColorBrewer)
+library(factoextra)
+library(e1071)
+library(candisc)
+
+
+
+###### Questão 4 ######
+
 #### Base de dados ####
 
 # Leitura da base de dados pelo github
@@ -10,17 +29,7 @@ ips_anos = list(ips_2016 = dplyr::filter(ips, ano == 2016),
                 ips_2022 = dplyr::filter(ips, ano == 2022))
 
 names(ips)
-# Importando pacotes
 
-library(dplyr)
-library(ggplot2)
-library(reshape2)
-library(corrplot)
-library(caret)
-library(tidyr)
-library(sf)
-library(RColorBrewer)
-library(factoextra)
 
 #### ANÁLISE DESCRITIVA ####
 
@@ -115,7 +124,8 @@ ggplot(ips_long, aes(x = as.factor(ano), y = valor, group = interaction(ano, var
 # Mapa de calor IPS
 dados_geojson <- st_read("https://raw.githubusercontent.com/Claudionor20/MultivariateAnalysis/main/mapa.geojson")
 dados_ips_2022 <- ips[ips$ano == 2022, ]
-# Substituir Maré por Complexo da Maré
+
+
 dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Maré"] <- "Complexo da Maré"
 dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Iraja"] <- "Irajá"
 dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Portuaria"] <- "Portuária"
@@ -124,9 +134,6 @@ dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Ba
 dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Cidade De Deus"] <- "Cidade de Deus"
 dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Complexo Do Alemão"] <- "Complexo do Alemão"
 dados_ips_2022$regiao_administrativa[dados_ips_2022$regiao_administrativa == "Ilha Do Governador"] <- "Ilha do Governador"
-
-# Achar um shapefile melhor se pá! Já que na base do shapefile tem Páqueta e não tem Rio de Janeiro
-
 
 regioes_ips_2020 <- merge(dados_geojson, dados_ips_2022, by.x = "nomera", by.y = "regiao_administrativa")
 
@@ -145,23 +152,6 @@ ggplot() +
   theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
         legend.title = element_text(size = 12),
         legend.text = element_text(size = 10))
-
-
-
-# Fazendo correlação entre as variáveis
-
-correlacao = cor(ips[,-c(1,2)])
-dev.new(width = 2000, height = 2000, res = 3000) # Largura e altura em polegadas
-corrplot(correlacao, method = "circle", tl.cex = 0.6)
-
-# Variaveis com alta correlação entre si (Sem contar o IPS)
-base_sem_ips <- ips[,-c(1,2,3)]
-correlacao_sem_ips <- cor(base_sem_ips)
-
-variaveis_correlacionadas <- findCorrelation(correlacao_sem_ips, cutoff = 0.7)
-
-nomes_variaveis_correlacionadas <- colnames(base_sem_ips)[variaveis_correlacionadas]
-print(nomes_variaveis_correlacionadas)
 
 #### PCA ####
 library(dplyr)
